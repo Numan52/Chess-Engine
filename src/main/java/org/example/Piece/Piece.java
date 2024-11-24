@@ -2,6 +2,9 @@ package org.example.Piece;
 
 import org.example.Board;
 import org.example.Board;
+import org.example.Move;
+
+import java.util.List;
 
 public abstract class Piece {
     private PieceType type;
@@ -9,9 +12,8 @@ public abstract class Piece {
     private int row;
     private int col;
     private boolean hasMoved;
-
-    double xOffset, yOffset;
     private Board chessboard;
+
 
     Piece(Board chessboard, int row, int y, boolean isWhite, PieceType type) {
         this.row = row;
@@ -22,18 +24,20 @@ public abstract class Piece {
 
     }
 
-    //public abstract void move();
-
     public abstract boolean canMoveTo(int row, int col);
+    public abstract List<Move> generatePossibleMoves();
+
 
     public boolean isWithinBoard(int targetRow, int targetCol) {
         return targetRow <= 7 && targetRow >= 0 && targetCol <= 7 && targetCol >= 0;
     }
 
+
     public boolean isFriendlyPiece(int targetRow, int targetCol) {
         Piece pieceAtTargetLocation = this.getChessboard().getBoardState()[targetRow][targetCol];
         return ((pieceAtTargetLocation != null) && (pieceAtTargetLocation.getIsWhite()) == this.getIsWhite());
     }
+
 
     public boolean isPieceBlockingDiagonal(int targetRow, int targetCol) {
         int rowDirection = targetRow > row ? 1 : -1;
@@ -51,6 +55,7 @@ public abstract class Piece {
         }
         return false;
     }
+
 
     public boolean isPieceBlockingLine(int targetRow, int targetCol) {
         int rowDirection = 0;
@@ -85,9 +90,11 @@ public abstract class Piece {
         return false;
     }
 
+
     public int getRow() {
         return row;
     }
+
     public void setRow(int row) {
         this.row = row;
     }
@@ -114,7 +121,6 @@ public abstract class Piece {
         return chessboard;
     }
 
-
     public boolean getHasMoved() {
         return hasMoved;
     }
@@ -122,4 +128,5 @@ public abstract class Piece {
     public void setHasMoved(boolean hasMoved) {
         this.hasMoved = hasMoved;
     }
+
 }

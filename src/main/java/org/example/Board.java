@@ -2,20 +2,25 @@ package org.example;
 
 import org.example.Piece.*;
 
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.List;
 
 public class Board {
 
     public static final int CHESSBOARD_ROWS = 8;
     public static final int CHESSBOARD_COLUMNS = 8;
-
+    private boolean isGameOver;
 
     private Piece[][] boardState = new Piece[8][8];
+    private Move lastMove;
 
     private static final double squareSize = 95;
 
     public Board() {
         createChessboard();
+        this.lastMove = null;
+        this.isGameOver = false;
     }
 
 
@@ -30,7 +35,6 @@ public class Board {
         }
 
     }
-
 
 
     public void removePieceFromBoard(int row, int col) {
@@ -97,10 +101,34 @@ public class Board {
     }
 
 
+    public List<Move> getAllPossibleMoves(boolean isWhitesTurn) {
+        List<Move> moves = new ArrayList<>();
+
+        return moves;
+    }
+
+
+    public void makeMove(Move move) {
+
+    }
+
+
+    public void undoMove() {
+
+    }
 
 
     public Piece[][] getBoardState() {
         return boardState;
+    }
+
+
+    public boolean isGameOver() {
+        return isGameOver;
+    }
+
+    public void setGameOver(boolean gameOver) {
+        isGameOver = gameOver;
     }
 
     public void setBoardState(Piece[][] boardState) {
@@ -136,5 +164,12 @@ public class Board {
         return null;
     }
 
+    public Move getLastMove() {
+        return lastMove;
+    }
+
+    public void setLastMove(Move lastMove) {
+        this.lastMove = lastMove;
+    }
 }
 
