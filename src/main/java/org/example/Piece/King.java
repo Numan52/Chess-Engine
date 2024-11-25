@@ -25,7 +25,6 @@ public class King extends Piece {
             return false;
         }
 
-        // TODO: check if opponent can capture king
         if (Math.abs(targetRow - this.getRow()) <= 1 && Math.abs(targetCol - this.getCol()) <= 1) {
             return true;
         }
