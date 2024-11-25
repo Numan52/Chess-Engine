@@ -2,9 +2,13 @@ package org.example.Piece;
 
 
 import org.example.Board;
+import org.example.Move;
+
+import java.util.ArrayList;
+import java.util.List;
 
 public class King extends Piece {
-    private boolean hasCastled = false;
+
 
     public King(Board chessboard, int x, int y, boolean isWhite) {
         super(chessboard, x, y, isWhite, PieceType.KING);
@@ -13,86 +17,112 @@ public class King extends Piece {
 
     @Override
     public boolean canMoveTo(int targetRow, int targetCol) {
-        Piece pieceAtTargetLocation = this.getChessboard().getBoardState()[targetRow][targetCol];
         if (!isWithinBoard(targetRow, targetCol) || isFriendlyPiece(targetRow, targetCol)) {
             return false;
         }
-        // Right CASTLING
-        if (Math.abs(targetRow - this.getRow()) == 0 &&
-            targetCol == 6 &&
-            !isPieceBlockingLine(targetRow, targetCol)
-            && canCastle())
-        {
-            for (Piece[] piecesRow : getChessboard().getBoardState()) {
-                for (Piece piece : piecesRow) {
-                    if (piece != null) {
-                        System.out.println("------ king castle right  -------");
-                        if (piece.getIsWhite() != this.getIsWhite() &&
-                            (piece.canMoveTo(targetRow, 5) || piece.canMoveTo(targetRow, 6))) {
-                            return false;
-                        }
-                    }
-                }
-            }
 
-            Piece rook = getChessboard().getBoardState()[targetRow][7];
-            if (rook != null &&
-                rook.getCol() == this.getCol() + 3 &&
-                !rook.getHasMoved())
-            {
-                System.out.println(targetRow);
-                System.out.println("right castled");
-                return true;
-            }
+        if (areSquaresUnderAttack(new int[][] {{targetRow, targetCol}})) {
+            return false;
         }
 
-        // LEFT CASTLING
-        if (Math.abs(targetRow - this.getRow()) == 0 &&
-                targetCol == 2 &&
-                !isPieceBlockingLine(targetRow, 0)
-                && canCastle())
-        {
-            for (Piece[] piecesRow : getChessboard().getBoardState()) {
-                for (Piece piece : piecesRow) {
-                    if (piece != null) {
-
-                        if (piece.getIsWhite() != this.getIsWhite() &&
-                            (piece.canMoveTo(targetRow, 3) || piece.canMoveTo(targetRow, 2) || piece.canMoveTo(targetRow, 1)))
-                        {
-                            return false;
-                        }
-                    }
-
-                }
-            }
-
-            Piece rook = getChessboard().getBoardState()[targetRow][0];
-            if (rook != null &&
-                rook.getCol() == this.getCol() - 4 &&
-                !rook.getHasMoved())
-            {
-                System.out.println(targetRow);
-                System.out.println("right castled");
-                return true;
-            }
-        }
-
-        if (Math.abs(targetRow - this.getRow()) + Math.abs(targetCol - this.getCol()) == 1 ||
-            Math.abs(targetRow - this.getRow()) * Math.abs(targetCol - this.getCol()) == 1)
-        {
-            System.out.println(this + ": can move to: " +  targetRow + ", " + targetCol);
+        // TODO: check if opponent can capture king
+        if (Math.abs(targetRow - this.getRow()) <= 1 && Math.abs(targetCol - this.getCol()) <= 1) {
             return true;
+        }
+
+        // Handle castling
+        if (canCastleRight(targetRow, targetCol)) {
+            return true;
+        }
+        if (canCastleLeft(targetRow, targetCol)) {
+            return true;
+        }
+
+        return false;
+
+    }
+
+
+    private boolean canCastleRight(int targetRow, int targetCol) {
+        if (this.hasMoved() || targetCol != 6 || targetRow != this.getRow()) {
+            return false;
+        }
+
+        // Check that the path to the right rook is clear
+        if (isPieceBlockingLine(this.getRow(), 7)) {
+            return false;
+        }
+
+        // Validate the rook
+        Piece rook = this.getChessboard().getBoardState()[this.getRow()][7];
+        if (rook == null || rook.getType() != PieceType.ROOK || rook.hasMoved()) {
+            return false;
+        }
+
+        // Ensure no attacking piece threatens the king or the squares it passes through
+        return !areSquaresUnderAttack(new int[][] {
+                {this.getRow(), 4}, {this.getRow(), 5}, {this.getRow(), 6}
+        });
+    }
+
+    private boolean canCastleLeft(int targetRow, int targetCol) {
+        if (this.hasMoved() || targetCol != 2 || targetRow != this.getRow()) {
+            return false;
+        }
+
+        // Check that the path to the left rook is clear
+        if (isPieceBlockingLine(this.getRow(), 0)) {
+            return false;
+        }
+
+        // Validate the rook
+        Piece rook = this.getChessboard().getBoardState()[this.getRow()][0];
+        if (rook == null || rook.getType() != PieceType.ROOK || rook.hasMoved()) {
+            return false;
+        }
+
+        // Ensure no attacking piece threatens the king or the squares it passes through
+        return !areSquaresUnderAttack(new int[][] {
+                {this.getRow(), 4}, {this.getRow(), 3}, {this.getRow(), 2}
+        });
+    }
+
+    private boolean areSquaresUnderAttack(int[][] squares) {
+        for (int[] square : squares) {
+            int row = square[0];
+            int col = square[1];
+            for (Piece[] rowPieces : getChessboard().getBoardState()) {
+                for (Piece piece : rowPieces) {
+                    if (piece != null && piece.getIsWhite() != this.getIsWhite() && piece.canMoveTo(row, col)) {
+                        return true;
+                    }
+                }
+            }
         }
         return false;
     }
 
-    public boolean canCastle() {
-        if (hasCastled || getHasMoved()) {
-            return false;
-        }
-        return true;
 
+
+    @Override
+    public List<Move> generatePossibleMoves() {
+        int[][] squares = {
+                {1, 1}, {1, -1}, {-1, -1}, {-1, 1},
+                {1, 0}, {0, 1}, {-1, 0}, {0, -1}
+        };
+
+        List<Move> possibleMoves = new ArrayList<>(super.generateFixedMoves(squares));
+
+        if (canCastleLeft(this.getRow(), 2)) {
+            possibleMoves.add(new Move(this.getRow(), this.getCol(), this.getRow(), 2, this, null, true, false, null));
+        }
+        if (canCastleRight(this.getRow(), 6)) {
+            possibleMoves.add(new Move(this.getRow(), this.getCol(), this.getRow(), 6, this, null, true, false, null));
+        }
+
+        return possibleMoves;
     }
+
 
     @Override
     public String toString() {
@@ -103,11 +133,4 @@ public class King extends Piece {
                 '}';
     }
 
-    public void setHasCastled(boolean hasCastled) {
-        this.hasCastled = hasCastled;
-    }
-
-    public boolean isHasCastled() {
-        return hasCastled;
-    }
 }

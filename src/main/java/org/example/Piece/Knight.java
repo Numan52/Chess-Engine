@@ -2,6 +2,10 @@ package org.example.Piece;
 
 
 import org.example.Board;
+import org.example.Move;
+
+import java.util.ArrayList;
+import java.util.List;
 
 public class Knight extends Piece {
     public Knight(Board chessboard, int x, int y, boolean isWhite) {
@@ -24,6 +28,12 @@ public class Knight extends Piece {
             return true;
         }
         return false;
+    }
+
+    @Override
+    public List<Move> generatePossibleMoves() {
+        int[][] squares = {{2, 1}, {1, 2}, {-1, 2}, {-2, 1}, {-2, -1}, {-1, -2}, {1, -2}, {2, -1}};
+        return super.generateFixedMoves(squares);
     }
 
     @Override

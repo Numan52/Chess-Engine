@@ -2,6 +2,10 @@ package org.example.Piece;
 
 
 import org.example.Board;
+import org.example.Move;
+
+import java.util.ArrayList;
+import java.util.List;
 
 public class Bishop extends Piece {
 
@@ -25,6 +29,12 @@ public class Bishop extends Piece {
         }
 
         return false;
+    }
+
+    @Override
+    public List<Move> generatePossibleMoves() {
+        int[][] directions = {{1, 1}, {1, -1}, {-1, -1}, {-1, 1}};
+        return super.generateDirectionalMoves(directions);
     }
 
     @Override

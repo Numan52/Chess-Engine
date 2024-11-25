@@ -2,6 +2,9 @@ package org.example.Piece;
 
 
 import org.example.Board;
+import org.example.Move;
+
+import java.util.List;
 
 public class Queen extends Piece {
 
@@ -32,6 +35,15 @@ public class Queen extends Piece {
         }
         System.out.println(this.toString() + ": cannot move to " + targetRow + ", " + targetCol );
         return false;
+    }
+
+    @Override
+    public List<Move> generatePossibleMoves() {
+        int[][] directions = {
+                {1, 1}, {1, -1}, {-1, -1}, {-1, 1},
+                {1, 0}, {0, 1}, {-1, 0}, {0, -1}
+        };
+        return super.generateDirectionalMoves(directions);
     }
 
     @Override

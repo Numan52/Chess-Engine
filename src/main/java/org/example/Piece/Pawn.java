@@ -38,7 +38,7 @@ public class Pawn extends Piece {
             return true;
         }
         // 2 squares forward
-        if (movedRows == 2 && !getHasMoved() && pieceAtTargetLocation == null && !isPieceBlockingLine(targetRow, targetCol)) {
+        if (movedRows == 2 && !hasMoved() && pieceAtTargetLocation == null && !isPieceBlockingLine(targetRow, targetCol)) {
             return true;
         }
         if (pieceAtTargetLocation != null && movedRows == 1 && movedCols == 1 ) {

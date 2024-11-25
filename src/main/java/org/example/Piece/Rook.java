@@ -2,6 +2,9 @@ package org.example.Piece;
 
 
 import org.example.Board;
+import org.example.Move;
+
+import java.util.List;
 
 public class Rook extends Piece{
 
@@ -24,6 +27,12 @@ public class Rook extends Piece{
         }
 
         return false;
+    }
+
+    @Override
+    public List<Move> generatePossibleMoves() {
+        int[][] directions = {{1, 0}, {0, 1}, {-1, 0}, {0, -1}};
+        return super.generateDirectionalMoves(directions);
     }
 
 

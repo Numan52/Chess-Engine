@@ -1,9 +1,9 @@
 package org.example.Piece;
 
 import org.example.Board;
-import org.example.Board;
 import org.example.Move;
 
+import java.util.ArrayList;
 import java.util.List;
 
 public abstract class Piece {
@@ -25,8 +25,8 @@ public abstract class Piece {
     }
 
     public abstract boolean canMoveTo(int row, int col);
-    public abstract List<Move> generatePossibleMoves();
 
+    public abstract List<Move> generatePossibleMoves();
 
     public boolean isWithinBoard(int targetRow, int targetCol) {
         return targetRow <= 7 && targetRow >= 0 && targetCol <= 7 && targetCol >= 0;
@@ -91,6 +91,57 @@ public abstract class Piece {
     }
 
 
+    // for knight and king
+    public List<Move> generateFixedMoves(int[][] squares) {
+        List<Move> possibleMoves = new ArrayList<>();
+
+        for (int[] square : squares) {
+            int targetRow = this.getRow() + square[0];
+            int targetCol = this.getCol() + square[1];
+
+            if (this.canMoveTo(targetRow, targetCol)) {
+                Piece capturedPiece = this.getChessboard().getBoardState()[targetRow][targetCol];
+                possibleMoves.add(new Move(
+                        this.getRow(), this.getCol(), targetRow, targetCol, this,
+                        capturedPiece, false, false, null
+                ));
+            }
+        }
+        return possibleMoves;
+    }
+
+    // for rook, bishop and queen
+    protected List<Move> generateDirectionalMoves(int[][] directions) {
+        List<Move> possibleMoves = new ArrayList<>();
+
+        for (int[] direction : directions) {
+            int targetRow = this.getRow();
+            int targetCol = this.getCol();
+
+            while (true) {
+                targetRow += direction[0];
+                targetCol += direction[1];
+
+                if (!isWithinBoard(targetRow, targetCol) || isFriendlyPiece(targetRow, targetCol)) {
+                    break;
+                }
+
+                Piece capturedPiece = this.getChessboard().getBoardState()[targetRow][targetCol];
+                possibleMoves.add(new Move(
+                        this.getRow(), this.getCol(), targetRow, targetCol, this,
+                        capturedPiece, false, false, null
+                ));
+
+                if (capturedPiece != null) {
+                    break;
+                }
+
+            }
+        }
+        return possibleMoves;
+    }
+
+
     public int getRow() {
         return row;
     }
@@ -121,12 +172,13 @@ public abstract class Piece {
         return chessboard;
     }
 
-    public boolean getHasMoved() {
+    public boolean hasMoved() {
         return hasMoved;
     }
 
     public void setHasMoved(boolean hasMoved) {
         this.hasMoved = hasMoved;
     }
+
 
 }
