@@ -5,17 +5,17 @@ import org.example.Piece.*;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Stack;
 
 public class Board {
 
     public static final int CHESSBOARD_ROWS = 8;
     public static final int CHESSBOARD_COLUMNS = 8;
     private boolean isGameOver;
-
+    private Stack<Move> moveHistory = new Stack<>();
     private Piece[][] boardState = new Piece[8][8];
     private Move lastMove;
 
-    private static final double squareSize = 95;
 
     public Board() {
         createChessboard();
@@ -103,18 +103,61 @@ public class Board {
 
     public List<Move> getAllPossibleMoves(boolean isWhitesTurn) {
         List<Move> moves = new ArrayList<>();
-
+        for (Piece[] pieceRow : getBoardState()) {
+            for (Piece piece : pieceRow) {
+                if (piece != null && piece.getIsWhite() == isWhitesTurn) {
+                    moves.addAll(piece.generatePossibleMoves());
+                }
+            }
+        }
         return moves;
     }
 
 
     public void makeMove(Move move) {
+        this.boardState[move.getStartRow()][move.getStartCol()] = null;
+        this.boardState[move.getTargetCol()][move.getTargetCol()] = move.getMovedPiece();
 
+        move.getMovedPiece().setMoveCount(move.getMovedPiece().getMoveCount() + 1);
+        move.getMovedPiece().setRow(move.getTargetRow());
+        move.getMovedPiece().setCol(move.getTargetCol());
+
+        this.moveHistory.push(move);
+        this.lastMove = move;
     }
 
+    //TODO: Fix
+    public void undoMove(Move move) {
+        this.boardState[move.getStartRow()][move.getStartCol()] = move.getMovedPiece();
+        this.boardState[move.getTargetRow()][move.getTargetCol()] = move.getCapturedPiece();
 
-    public void undoMove() {
+        move.getMovedPiece().setRow(move.getStartRow());
+        move.getMovedPiece().setCol(move.getStartCol());
+        move.getMovedPiece().setMoveCount(move.getMovedPiece().getMoveCount() - 1);
 
+        // Handle castling
+        if (move.isCastling()) {
+            int rookStartCol = (move.getTargetCol() == 2) ? 0 : 7;
+            int rookEndCol = (move.getTargetCol() == 2) ? 3 : 5;
+
+            Piece rook = this.boardState[move.getTargetRow()][rookEndCol];
+
+            this.boardState[move.getTargetRow()][rookEndCol] = null;
+            this.boardState[move.getTargetRow()][rookStartCol] = rook;
+
+            rook.setCol(rookStartCol);
+            rook.setMoveCount(rook.getMoveCount() - 1);
+        }
+
+        if (!this.moveHistory.isEmpty()) {
+            this.moveHistory.pop();
+        }
+
+        if (!this.moveHistory.isEmpty()) {
+            this.lastMove = this.moveHistory.peek();
+        } else {
+            this.lastMove = null;
+        }
     }
 
 
