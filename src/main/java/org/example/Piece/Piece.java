@@ -11,7 +11,7 @@ public abstract class Piece {
     private boolean isWhite;
     private int row;
     private int col;
-    private boolean hasMoved;
+    private int moveCount;
     private Board chessboard;
 
 
@@ -172,12 +172,12 @@ public abstract class Piece {
         return chessboard;
     }
 
-    public boolean hasMoved() {
-        return hasMoved;
+    public int getMoveCount() {
+        return moveCount;
     }
 
-    public void setHasMoved(boolean hasMoved) {
-        this.hasMoved = hasMoved;
+    public void setMoveCount(int moveCount) {
+        this.moveCount = moveCount;
     }
 
 

@@ -43,7 +43,7 @@ public class King extends Piece {
 
 
     private boolean canCastleRight(int targetRow, int targetCol) {
-        if (this.hasMoved() || targetCol != 6 || targetRow != this.getRow()) {
+        if (this.getMoveCount() > 0 || targetCol != 6 || targetRow != this.getRow()) {
             return false;
         }
 
@@ -54,7 +54,7 @@ public class King extends Piece {
 
         // Validate the rook
         Piece rook = this.getChessboard().getBoardState()[this.getRow()][7];
-        if (rook == null || rook.getType() != PieceType.ROOK || rook.hasMoved()) {
+        if (rook == null || rook.getType() != PieceType.ROOK || rook.getMoveCount() > 0) {
             return false;
         }
 
@@ -65,7 +65,7 @@ public class King extends Piece {
     }
 
     private boolean canCastleLeft(int targetRow, int targetCol) {
-        if (this.hasMoved() || targetCol != 2 || targetRow != this.getRow()) {
+        if (this.getMoveCount() > 0 || targetCol != 2 || targetRow != this.getRow()) {
             return false;
         }
 
@@ -76,7 +76,7 @@ public class King extends Piece {
 
         // Validate the rook
         Piece rook = this.getChessboard().getBoardState()[this.getRow()][0];
-        if (rook == null || rook.getType() != PieceType.ROOK || rook.hasMoved()) {
+        if (rook == null || rook.getType() != PieceType.ROOK || rook.getMoveCount() > 0) {
             return false;
         }
 
