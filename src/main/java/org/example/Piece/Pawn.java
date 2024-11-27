@@ -9,6 +9,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class Pawn extends Piece {
+    private static final int VALUE = 100;
 
     public Pawn(Board chessboard, int x, int y, boolean isWhite) {
         super(chessboard, x, y, isWhite, PieceType.PAWN);
@@ -156,7 +157,10 @@ public class Pawn extends Piece {
     }
 
 
-
+    @Override
+    public int getValue() {
+        return VALUE;
+    }
 
     @Override
     public String toString() {

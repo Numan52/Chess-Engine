@@ -1,8 +1,6 @@
 package org.example;
 
 import org.example.Piece.Piece;
-
-import javax.swing.text.Position;
 import java.util.List;
 
 public class Searcher {
@@ -17,41 +15,58 @@ public class Searcher {
     }
 
     // includes alpha beta pruning
-    public int minimax(Board board, int depth, int alpha, int beta, boolean isWhitesTurn) {
+    public MoveScore minimax(Board board, int depth, int alpha, int beta, boolean isWhitesTurn) {
         if (depth == 0 || board.isGameOver()) {
-            return positionEvaluater.evaluatePosition();
+            return new MoveScore(null, positionEvaluater.evaluatePosition());
         }
+
+        Move bestMove = null;
 
         if (isWhitesTurn) {
             List<Move> possibleMoves = board.getAllPossibleMoves(true);
             int maxEval = Integer.MIN_VALUE;
             for (Move move : possibleMoves) {
                 board.makeMove(move);
-                int eval = minimax(board, depth - 1, alpha, beta, false);
-                maxEval = Math.max(maxEval, eval);
+                int eval = minimax(board, depth - 1, alpha, beta, false).score;
+                board.undoMove(move);
+
+                if (eval > maxEval) {
+                    bestMove = move;
+                    maxEval = eval;
+                }
+
                 alpha = Math.max(alpha, eval);
                 if (beta <= alpha) {
                     break;
                 }
-                board.undoMove(move);
             }
-            return maxEval;
+            return new MoveScore(bestMove, maxEval);
 
         } else {
             List<Move> possibleMoves = board.getAllPossibleMoves(false);
             int minEval = Integer.MAX_VALUE;
             for (Move move : possibleMoves) {
                 board.makeMove(move);
-                int eval = minimax(board, depth - 1, alpha, beta, true);
-                minEval = Math.min(minEval, eval);
+                int eval = minimax(board, depth - 1, alpha, beta, true).score;
+                board.undoMove(move);
+
+                if (eval < minEval) {
+                    minEval = Math.min(minEval, eval);
+                    bestMove = move;
+                }
+
                 beta = Math.min(beta, eval);
                 if (beta <= alpha) {
                     break;
                 }
-                board.undoMove(move);
+
             }
-            return minEval;
+            return new MoveScore(bestMove, minEval);
         }
 
+    }
+
+    public Move getBestMove(boolean isWhiteTurn) {
+        return minimax(board, depth, Integer.MIN_VALUE, Integer.MAX_VALUE, isWhiteTurn).move;
     }
 }

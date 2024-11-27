@@ -8,6 +8,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class Bishop extends Piece {
+    private static final int VALUE = 325;
 
     public Bishop(Board chessboard, int x, int y, boolean isWhite) {
         super(chessboard, x, y, isWhite, PieceType.BISHOP);
@@ -36,6 +37,12 @@ public class Bishop extends Piece {
         int[][] directions = {{1, 1}, {1, -1}, {-1, -1}, {-1, 1}};
         return super.generateDirectionalMoves(directions);
     }
+
+    @Override
+    public int getValue() {
+        return VALUE;
+    }
+
 
     @Override
     public String toString() {

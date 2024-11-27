@@ -7,6 +7,7 @@ import org.example.Move;
 import java.util.List;
 
 public class Queen extends Piece {
+    private static final int VALUE = 900;
 
     public Queen(Board chessboard, int x, int y, boolean isWhite) {
         super(chessboard, x, y, isWhite, PieceType.QUEEN);
@@ -44,6 +45,11 @@ public class Queen extends Piece {
                 {1, 0}, {0, 1}, {-1, 0}, {0, -1}
         };
         return super.generateDirectionalMoves(directions);
+    }
+
+    @Override
+    public int getValue() {
+        return VALUE;
     }
 
     @Override

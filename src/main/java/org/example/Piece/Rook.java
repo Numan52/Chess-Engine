@@ -7,6 +7,7 @@ import org.example.Move;
 import java.util.List;
 
 public class Rook extends Piece{
+    private static final int VALUE = 500;
 
     public Rook(Board chessboard, int x, int y, boolean isWhite) {
         super(chessboard, x, y, isWhite, PieceType.ROOK);
@@ -35,6 +36,11 @@ public class Rook extends Piece{
         return super.generateDirectionalMoves(directions);
     }
 
+
+    @Override
+    public int getValue() {
+        return VALUE;
+    }
 
     @Override
     public String toString() {

@@ -41,6 +41,20 @@ public class King extends Piece {
 
     }
 
+    // needed as replacement for canMoveTo() in areSquaresUnderAttack()
+    public boolean canAttack(int targetRow, int targetCol) {
+        if (!isWithinBoard(targetRow, targetCol) || isFriendlyPiece(targetRow, targetCol)) {
+            return false;
+        }
+
+        if (Math.abs(targetRow - this.getRow()) <= 1 && Math.abs(targetCol - this.getCol()) <= 1) {
+            return true;
+        }
+
+        return false;
+
+    }
+
 
     private boolean canCastleRight(int targetRow, int targetCol) {
         if (this.getMoveCount() > 0 || targetCol != 6 || targetRow != this.getRow()) {
@@ -92,9 +106,20 @@ public class King extends Piece {
             int col = square[1];
             for (Piece[] rowPieces : getChessboard().getBoardState()) {
                 for (Piece piece : rowPieces) {
-                    if (piece != null && piece.getIsWhite() != this.getIsWhite() && piece.canMoveTo(row, col)) {
-                        return true;
+                    if (piece != null && piece.getIsWhite() != this.getIsWhite()) {
+                        if (piece.getType() == PieceType.KING) {
+                            // For Kings, use canAttack to avoid cyclic dependency between areSquaresUnderAttack() and canMoveTo()
+                            if (((King) piece).canAttack(row, col)) {
+                                return true;
+                            }
+                        } else {
+                            if (piece.canMoveTo(row, col)) {
+                                return true;
+                            }
+
+                        }
                     }
+
                 }
             }
         }
@@ -120,6 +145,12 @@ public class King extends Piece {
         }
 
         return possibleMoves;
+    }
+
+
+    @Override
+    public int getValue() {
+        return 0;
     }
 
 

@@ -26,6 +26,7 @@ public abstract class Piece {
 
     public abstract boolean canMoveTo(int row, int col);
 
+
     public abstract List<Move> generatePossibleMoves();
 
     public boolean isWithinBoard(int targetRow, int targetCol) {
@@ -40,6 +41,8 @@ public abstract class Piece {
 
 
     public boolean isPieceBlockingDiagonal(int targetRow, int targetCol) {
+        System.out.println("TargetRow: " + targetRow);
+        System.out.println("TargetCol: " + targetCol);
         int rowDirection = targetRow > row ? 1 : -1;
         int colDirection = targetCol > col ? 1 : -1;
 
@@ -90,6 +93,8 @@ public abstract class Piece {
         return false;
     }
 
+
+    // TODO: canMoveTo() should also consider checks
 
     // for knight and king
     public List<Move> generateFixedMoves(int[][] squares) {
@@ -180,5 +185,6 @@ public abstract class Piece {
         this.moveCount = moveCount;
     }
 
+    public abstract int getValue();
 
 }

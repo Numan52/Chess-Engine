@@ -8,6 +8,8 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class Knight extends Piece {
+    private static final int VALUE = 300;
+
     public Knight(Board chessboard, int x, int y, boolean isWhite) {
         super(chessboard, x, y, isWhite, PieceType.KNIGHT);
     }
@@ -35,6 +37,12 @@ public class Knight extends Piece {
         int[][] squares = {{2, 1}, {1, 2}, {-1, 2}, {-2, 1}, {-2, -1}, {-1, -2}, {1, -2}, {2, -1}};
         return super.generateFixedMoves(squares);
     }
+
+    @Override
+    public int getValue() {
+        return VALUE;
+    }
+
 
     @Override
     public String toString() {
