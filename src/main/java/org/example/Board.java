@@ -126,7 +126,7 @@ public class Board {
         this.lastMove = move;
     }
 
-    //TODO: Fix
+
     public void undoMove(Move move) {
         this.boardState[move.getStartRow()][move.getStartCol()] = move.getMovedPiece();
         this.boardState[move.getTargetRow()][move.getTargetCol()] = move.getCapturedPiece();
