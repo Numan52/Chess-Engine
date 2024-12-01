@@ -8,7 +8,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class King extends Piece {
-
+    private boolean hasCastleRights = true;
 
     public King(Board chessboard, int x, int y, boolean isWhite) {
         super(chessboard, x, y, isWhite, PieceType.KING);
@@ -130,12 +130,12 @@ public class King extends Piece {
 
     @Override
     public List<Move> generatePossibleMoves() {
-        int[][] squares = {
+        int[][] directions = {
                 {1, 1}, {1, -1}, {-1, -1}, {-1, 1},
                 {1, 0}, {0, 1}, {-1, 0}, {0, -1}
         };
 
-        List<Move> possibleMoves = new ArrayList<>(super.generateFixedMoves(squares));
+        List<Move> possibleMoves = new ArrayList<>(super.generateFixedMoves(directions));
 
         if (canCastleLeft(this.getRow(), 2)) {
             possibleMoves.add(new Move(this.getRow(), this.getCol(), this.getRow(), 2, this, null, true, false, null));
@@ -147,6 +147,14 @@ public class King extends Piece {
         return possibleMoves;
     }
 
+
+    public boolean isHasCastleRights() {
+        return hasCastleRights;
+    }
+
+    public void setHasCastleRights(boolean hasCastleRights) {
+        this.hasCastleRights = hasCastleRights;
+    }
 
     @Override
     public int getValue() {

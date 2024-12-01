@@ -68,4 +68,16 @@ public class Move {
     public PieceType getPromotionPiece() {
         return promotionPiece;
     }
+
+    @Override
+    public String toString() {
+        return "Move{" +
+                "capturedPiece=" + capturedPiece +
+                ", movedPiece=" + movedPiece +
+                ", targetCol=" + targetCol +
+                ", targetRow=" + targetRow +
+                ", startCol=" + startCol +
+                ", startRow=" + startRow +
+                '}';
+    }
 }
