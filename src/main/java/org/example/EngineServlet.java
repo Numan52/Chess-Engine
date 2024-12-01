@@ -2,14 +2,18 @@ package org.example;
 
 
 
+import com.google.gson.Gson;
 import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import org.example.Piece.Piece;
+import org.json.JSONException;
+import org.json.JSONObject;
 
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.util.Arrays;
+import java.util.List;
 
 public class EngineServlet extends HttpServlet {
     private Board board = new Board();
@@ -21,12 +25,13 @@ public class EngineServlet extends HttpServlet {
 
     @Override
     public void doPost(HttpServletRequest request, HttpServletResponse response) throws IOException {
+        Gson gson = new Gson();
         StringBuilder jsonBody = new StringBuilder();
+
         try (BufferedReader reader = request.getReader()) {
             String line;
             while ((line = reader.readLine()) != null) {
                 jsonBody.append(line);
-                System.out.println(line);
             }
         }
         catch (IOException e) {
@@ -36,10 +41,25 @@ public class EngineServlet extends HttpServlet {
             response.getWriter().write("Failed to update the board: " + e.getMessage());
         }
 
-        System.out.println(jsonBody.toString());
+        String requestBody = jsonBody.toString();
+        String fen = null;
+        try {
+            JSONObject json = new JSONObject(requestBody);
+            fen = json.getString("fen");
+        } catch (JSONException e) {
+            response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
+            response.getWriter().write("Invalid JSON format or missing 'fen' attribute.");
+            return;
+        }
 
+        System.out.println("fen: " + fen);
 
-        MoveTranslator.updateBoard(jsonBody.toString(), board);
+        board.setBoardState(MoveParser.fenToBoardState(board, fen));
+        List<Move> moves = board.getAllPossibleMoves();
+        for (Move move : moves) {
+            System.out.println(move.toString());
+        }
+
         chessEngine.applyBestMove(false);
 
         System.out.println(Arrays.deepToString(board.getBoardState()));

@@ -50,12 +50,15 @@ public abstract class Piece {
         int col = this.col + colDirection;
 
         while(row != targetRow && col != targetCol) {
+            System.out.println("row: " + row);
+            System.out.println("col: " + col);
             if (chessboard.getBoardState()[row][col] != null){
                 return true;
             }
             row += rowDirection;
             col += colDirection;
         }
+        System.out.println("finish");
         return false;
     }
 
@@ -94,7 +97,7 @@ public abstract class Piece {
     }
 
 
-    // TODO: canMoveTo() should also consider checks
+
 
     // for knight and king
     public List<Move> generateFixedMoves(int[][] squares) {

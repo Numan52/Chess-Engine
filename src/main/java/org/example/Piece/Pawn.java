@@ -49,21 +49,18 @@ public class Pawn extends Piece {
         return false;
     }
 
-    private boolean isEnPassantPossible() {
-        Move lastMove = this.getChessboard().getLastMove();
-        return lastMove != null && lastMove.getMovedPiece().getType() == PieceType.PAWN
-                && Math.abs(lastMove.getStartRow() - lastMove.getTargetRow()) == 2
-                && lastMove.getTargetRow() == this.getRow()
-                && Math.abs(lastMove.getTargetCol() - this.getCol()) == 1;
-    }
+
+
 
 
     @Override
     public List<Move> generatePossibleMoves() {
         List<Move> possibleMoves = new ArrayList<>();
+        possibleMoves.addAll(generateForwardMoves());
+        possibleMoves.addAll(generateCaptures());
+        possibleMoves.add(generateEnPassantMove());
 
-
-        return List.of();
+        return possibleMoves;
     }
 
 
@@ -132,22 +129,26 @@ public class Pawn extends Piece {
         }
     }
 
+    // enPassantField is the field that the pawn will land in if after performing en passant (eg. f3)
+    public Move generateEnPassantMove() {
 
-    public List<Move> generateEnPassantMoves() {
-        List<Move> possibleEnPassantMoves = new ArrayList<>();
         int direction = this.getIsWhite() ? 1 : -1;
-        Move lastMove = this.getChessboard().getLastMove();
-        int enPassantCol = lastMove.getTargetCol();
-
-        if (isEnPassantPossible()) {
-            Piece capturedPiece = this.getChessboard().getBoardState()[this.getRow()][enPassantCol];
-            possibleEnPassantMoves.add(new Move(
-                    this.getRow(), this.getCol(), this.getRow() + direction, this.getCol() - 1, this, capturedPiece,
-                    false, true, null
-            ));
+        // TODO: Check if en passant moves are generated when available
+        // no en passant possible
+        if (this.getChessboard().getEnPassantField().equals("-")) {
+            return null;
         }
 
-        return possibleEnPassantMoves;
+        int enPassantCol = (int) this.getChessboard().getEnPassantField().charAt(0) - (int) 'a';
+
+        Piece capturedPiece = this.getChessboard().getBoardState()[this.getRow()][enPassantCol];
+        return new Move(
+                this.getRow(), this.getCol(), this.getRow() + direction, enPassantCol, this, capturedPiece,
+                false, true, null
+        );
+
+
+
     }
 
 

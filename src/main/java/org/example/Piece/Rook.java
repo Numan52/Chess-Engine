@@ -9,6 +9,7 @@ import java.util.List;
 public class Rook extends Piece{
     private static final int VALUE = 500;
 
+
     public Rook(Board chessboard, int x, int y, boolean isWhite) {
         super(chessboard, x, y, isWhite, PieceType.ROOK);
     }

@@ -14,13 +14,16 @@ public class Board {
     private boolean isGameOver;
     private Stack<Move> moveHistory = new Stack<>();
     private Piece[][] boardState = new Piece[8][8];
+    private boolean isWhitesTurn;
     private Move lastMove;
+    private String enPassantField;
 
 
     public Board() {
         createChessboard();
         this.lastMove = null;
         this.isGameOver = false;
+        this.isWhitesTurn = true;
     }
 
 
@@ -101,7 +104,7 @@ public class Board {
     }
 
 
-    public List<Move> getAllPossibleMoves(boolean isWhitesTurn) {
+    public List<Move> getAllPossibleMoves() {
         List<Move> moves = new ArrayList<>();
         for (Piece[] pieceRow : getBoardState()) {
             for (Piece piece : pieceRow) {
@@ -118,19 +121,21 @@ public class Board {
         this.boardState[move.getStartRow()][move.getStartCol()] = null;
         this.boardState[move.getTargetCol()][move.getTargetCol()] = move.getMovedPiece();
 
+        //TODO: remove captured piece after en passant
         move.getMovedPiece().setMoveCount(move.getMovedPiece().getMoveCount() + 1);
         move.getMovedPiece().setRow(move.getTargetRow());
         move.getMovedPiece().setCol(move.getTargetCol());
 
         this.moveHistory.push(move);
         this.lastMove = move;
+        setIsWhitesTurn(!getIsWhitesTurn());
     }
 
 
     public void undoMove(Move move) {
         this.boardState[move.getStartRow()][move.getStartCol()] = move.getMovedPiece();
         this.boardState[move.getTargetRow()][move.getTargetCol()] = move.getCapturedPiece();
-
+        //TODO: restore captured piece after en passant
         move.getMovedPiece().setRow(move.getStartRow());
         move.getMovedPiece().setCol(move.getStartCol());
         move.getMovedPiece().setMoveCount(move.getMovedPiece().getMoveCount() - 1);
@@ -158,6 +163,8 @@ public class Board {
         } else {
             this.lastMove = null;
         }
+
+        setIsWhitesTurn(!getIsWhitesTurn());
     }
 
 
@@ -213,6 +220,23 @@ public class Board {
 
     public void setLastMove(Move lastMove) {
         this.lastMove = lastMove;
+    }
+
+    public boolean getIsWhitesTurn() {
+        return isWhitesTurn;
+    }
+
+    public void setIsWhitesTurn(boolean whitesTurn) {
+        isWhitesTurn = whitesTurn;
+    }
+
+
+    public String getEnPassantField() {
+        return enPassantField;
+    }
+
+    public void setEnPassantField(String enPassantField) {
+        this.enPassantField = enPassantField;
     }
 }
 

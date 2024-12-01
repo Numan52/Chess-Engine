@@ -1,6 +1,5 @@
 package org.example;
 
-import org.example.Piece.Piece;
 import java.util.List;
 
 public class Searcher {
@@ -23,7 +22,7 @@ public class Searcher {
         Move bestMove = null;
 
         if (isWhitesTurn) {
-            List<Move> possibleMoves = board.getAllPossibleMoves(true);
+            List<Move> possibleMoves = board.getAllPossibleMoves();
             int maxEval = Integer.MIN_VALUE;
             for (Move move : possibleMoves) {
                 board.makeMove(move);
@@ -43,7 +42,9 @@ public class Searcher {
             return new MoveScore(bestMove, maxEval);
 
         } else {
-            List<Move> possibleMoves = board.getAllPossibleMoves(false);
+            System.out.print("Board State: ");
+            List<Move> possibleMoves = board.getAllPossibleMoves();
+
             int minEval = Integer.MAX_VALUE;
             for (Move move : possibleMoves) {
                 board.makeMove(move);
