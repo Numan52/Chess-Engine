@@ -13,7 +13,7 @@ public class Move {
     private final boolean isCastling;
     private final boolean isEnPassant;
     private final PieceType promotionPiece;
-
+    private int previousCastlingRights; // 4 bits - qkQK
 
     public Move(int startRow, int startCol, int targetRow, int targetCol, Piece movedPiece, Piece capturedPiece,
                 boolean isCastling, boolean isEnPassant, PieceType promotionPieceType) {
@@ -67,6 +67,14 @@ public class Move {
 
     public PieceType getPromotionPiece() {
         return promotionPiece;
+    }
+
+    public int getPreviousCastlingRights() {
+        return previousCastlingRights;
+    }
+
+    public void setPreviousCastlingRights(int previousCastlingRights) {
+        this.previousCastlingRights = previousCastlingRights;
     }
 
     @Override

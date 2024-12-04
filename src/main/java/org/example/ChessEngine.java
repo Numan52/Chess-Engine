@@ -24,15 +24,14 @@ public class ChessEngine {
 
         board.setBoardState(boardState);
         board.setIsWhitesTurn(isWhitesTurn);
-        board.setEnPassantField(enPassantField);
+        board.setEnPassantField(enPassantField); // TODO: NEED TO HANDLE MANUALLY DURING SEARCH
 
-        boolean isKingInCheck = board.isKingInCheck(board.getKing(isWhitesTurn));
-        board.setIsKingInCheck(isKingInCheck);
 
         updateCastlingRights(fen);
 
     }
 
+    // TODO: NEED TO HANDLE MANUALLY DURING SEARCH
     public void updateCastlingRights(String fen) {
         for (Piece[] piecesRow : board.getBoardState()) {
             for (Piece piece : piecesRow) {
@@ -58,6 +57,9 @@ public class ChessEngine {
     public void applyBestMove() {
         Move move = calculateBestMove();
         board.makeMove(move);
+
+        System.out.println();
+        System.out.println("Best move: " + move);
     }
 
     public Board getBoard() {

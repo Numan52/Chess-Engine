@@ -17,7 +17,7 @@ import java.util.List;
 public class EngineServlet extends HttpServlet {
     private Board board = new Board();
     private PositionEvaluater positionEvaluater = new PositionEvaluater(board);
-    private Searcher searcher = new Searcher(board, 15, positionEvaluater);
+    private Searcher searcher = new Searcher(board, 5, positionEvaluater);
     private ChessEngine chessEngine = new ChessEngine(board, searcher, positionEvaluater);
 
 
@@ -62,7 +62,7 @@ public class EngineServlet extends HttpServlet {
 //            System.out.println(move.toString());
 //        }
 
-//        chessEngine.applyBestMove();
+        chessEngine.applyBestMove();
 
 //        System.out.println(Arrays.deepToString(board.getBoardState()));
 //        for (Piece[] piecesRow : board.getBoardState()) {

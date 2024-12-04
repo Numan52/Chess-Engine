@@ -18,7 +18,7 @@ public class Board {
     private boolean isWhitesTurn;
     private Move lastMove;
     private String enPassantField;
-    private boolean isKingInCheck;
+    private int castlingRights; // 4 bits - qkQK
 
 
     public Board() {
@@ -120,7 +120,7 @@ public class Board {
         List<Move> movesToRemove = new ArrayList<>();
         for (Move move : moves) {
             boolean isWhitesMove = move.getMovedPiece().getIsWhite();
-            King king = (King) getKing(isWhitesMove);
+            King king = getKing(isWhitesMove);
             this.makeMove(move);
 
             if (isKingInCheck(king)){
@@ -178,10 +178,9 @@ public class Board {
 
         this.moveHistory.push(move);
         this.lastMove = move;
+        updateCastlingRights(move);
         setIsWhitesTurn(!getIsWhitesTurn());
     }
-
-
 
 
     public void undoMove(Move move) {
@@ -231,7 +230,63 @@ public class Board {
             this.lastMove = null;
         }
 
+        castlingRights = move.getPreviousCastlingRights();
         setIsWhitesTurn(!getIsWhitesTurn());
+    }
+
+
+    // TODO: NO NEED TO CALL THIS FOR THE SIDE WHO ALREADY LOST CASTLING RIGHTS
+    public void updateCastlingRights(Move move) {
+        move.setPreviousCastlingRights(this.castlingRights);
+
+        if (move.getMovedPiece().getType() == PieceType.KING) {
+            if (move.getMovedPiece().getIsWhite()) {
+                this.castlingRights &= ~0b0011; // bitwise AND Operation
+            } else {
+                this.castlingRights &= ~0b1100;
+            }
+        }
+
+        if (move.getMovedPiece().getType() == PieceType.ROOK) {
+            if (move.getStartRow() == 0 && move.getStartCol() == 0) {
+                this.castlingRights &= ~0b0010;
+            } else if (move.getStartRow() == 0 && move.getStartCol() == 7 ) {
+                this.castlingRights &= ~0b0001;
+            } else if (move.getStartRow() == 7 && move.getStartCol() == 0) {
+                this.castlingRights &= ~0b1000;
+            } else if (move.getStartRow() == 7 && move.getStartCol() == 7 ) {
+                this.castlingRights &= ~0b0100;
+            }
+        }
+
+        if (move.getCapturedPiece() != null && move.getCapturedPiece().getType() == PieceType.ROOK) {
+            if (move.getCapturedPiece().getRow() == 0 && move.getCapturedPiece().getCol() == 0 ) {
+                this.castlingRights &= ~0b0010;
+            } else if (move.getCapturedPiece().getRow() == 0 && move.getCapturedPiece().getCol() == 7) {
+                this.castlingRights &= ~0b0001;
+            } else if (move.getCapturedPiece().getRow() == 7 && move.getCapturedPiece().getCol() == 0) {
+                this.castlingRights &= ~0b1000;
+            } else if (move.getCapturedPiece().getRow() == 7 && move.getCapturedPiece().getCol() == 7) {
+                this.castlingRights &= ~0b0100;
+            }
+        }
+
+        bitsToCastlingRights();
+    }
+
+    private void bitsToCastlingRights() {
+        if ((castlingRights & 0b0001) != 0b0001 ) {
+            getKing(true).setHasKingsideCastlingRight(false);
+        }
+        if ((castlingRights & 0b0010) != 0b0010 ) {
+            getKing(true).setHasQueensideCastlingRight(false);
+        }
+        if ((castlingRights & 0b0100) != 0b0100 ) {
+            getKing(false).setHasKingsideCastlingRight(false);
+        }
+        if ((castlingRights & 0b1000) != 0b1000 ) {
+            getKing(false).setHasQueensideCastlingRight(false);
+        }
     }
 
 
@@ -250,18 +305,18 @@ public class Board {
     }
 
 
-    public Piece getKing(boolean isWhite) {
+    public King getKing(boolean isWhite) {
         for (Piece[] pieceRow : getBoardState()) {
             for (Piece piece : pieceRow) {
                 if (piece != null) {
                     if (isWhite) {
                         if (piece.getType() == PieceType.KING && piece.getIsWhite()) {
-                            return piece;
+                            return (King) piece;
                         }
                     }
                     else {
                         if (piece.getType() == PieceType.KING && !piece.getIsWhite()) {
-                            return piece;
+                            return (King) piece;
                         }
                     }
                 }
@@ -288,13 +343,7 @@ public class Board {
         this.boardState = boardState;
     }
 
-    public boolean getIsKingInCheck() {
-        return isKingInCheck;
-    }
 
-    public void setIsKingInCheck(boolean isKingInCheck) {
-        this.isKingInCheck = isKingInCheck;
-    }
 
     public Move getLastMove() {
         return lastMove;
