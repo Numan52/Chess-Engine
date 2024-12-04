@@ -1,4 +1,4 @@
-package org.example;
+package org.example.Servlets;
 
 
 
@@ -6,13 +6,12 @@ import com.google.gson.Gson;
 import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
-import org.example.Piece.Piece;
+import org.example.*;
 import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.io.BufferedReader;
 import java.io.IOException;
-import java.util.Arrays;
 import java.util.List;
 
 public class EngineServlet extends HttpServlet {
@@ -22,7 +21,7 @@ public class EngineServlet extends HttpServlet {
     private ChessEngine chessEngine = new ChessEngine(board, searcher, positionEvaluater);
 
 
-
+    // fen should have the following form: rnb1kbnr/ppp2ppp/8/3Np1q1/8/5N2/PPPPPPPP/R1BQKB1R w KQkq e6 1 4
     @Override
     public void doPost(HttpServletRequest request, HttpServletResponse response) throws IOException {
         Gson gson = new Gson();
@@ -54,22 +53,25 @@ public class EngineServlet extends HttpServlet {
 
         System.out.println("fen: " + fen);
 
-        board.setBoardState(MoveParser.fenToBoardState(board, fen));
+       chessEngine.updateBoard(fen);
+
+
         List<Move> moves = board.getAllPossibleMoves();
-        for (Move move : moves) {
-            System.out.println(move.toString());
-        }
 
-        chessEngine.applyBestMove(false);
+//        for (Move move : moves) {
+//            System.out.println(move.toString());
+//        }
 
-        System.out.println(Arrays.deepToString(board.getBoardState()));
-        for (Piece[] piecesRow : board.getBoardState()) {
-            for (Piece piece : piecesRow) {
-                if (piece != null) {
-                    System.out.println(piece.toString());
-                }
-            }
-        }
+//        chessEngine.applyBestMove();
+
+//        System.out.println(Arrays.deepToString(board.getBoardState()));
+//        for (Piece[] piecesRow : board.getBoardState()) {
+//            for (Piece piece : piecesRow) {
+//                if (piece != null) {
+//                    System.out.println(piece.toString());
+//                }
+//            }
+//        }
 
         response.setStatus(200);
         response.getOutputStream().println("lakaka");
