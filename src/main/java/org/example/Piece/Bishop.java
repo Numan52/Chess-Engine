@@ -19,7 +19,6 @@ public class Bishop extends Piece {
     public boolean canMoveTo(int targetRow, int targetCol) {
         int movedRows = Math.abs(targetRow - this.getRow());
         int movedCols = Math.abs(targetCol - this.getCol());
-        System.out.println(this.toString() + ": canMoveTo: " + targetRow + ", " + targetCol);
         if (!isWithinBoard(targetRow, targetCol) || isFriendlyPiece(targetRow, targetCol)) {
             return false;
         }

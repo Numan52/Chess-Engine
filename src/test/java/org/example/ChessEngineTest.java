@@ -1,6 +1,7 @@
 package org.example;
 
 import org.example.Piece.Piece;
+import org.example.Piece.PieceType;
 import org.example.Utils.BoardParser;
 import org.example.Utils.TestUtils;
 import org.junit.Assert;
@@ -21,7 +22,7 @@ public class ChessEngineTest {
     public void setUp() {
         board = new Board();
         positionEvaluater = new PositionEvaluater(board);
-        searcher = new Searcher(board, 15, positionEvaluater);
+        searcher = new Searcher(board, 6, 15000, positionEvaluater);
         chessEngine = new ChessEngine(board, searcher, positionEvaluater);
     }
 
@@ -105,7 +106,39 @@ public class ChessEngineTest {
     }
 
 
+    @Test
+    public void testSearcherCalculatesCorrectCapture() {
+        chessEngine.updateBoard("rnbqkbnr/ppp1p1pp/5p2/3pN3/4P3/8/PPPP1PPP/RNBQKB1R b KQkq - 1 3");
 
+        Move move = chessEngine.calculateBestMove().move;
+
+        Assert.assertEquals(PieceType.KNIGHT, move.getCapturedPiece().getType());
+        Assert.assertEquals(4, move.getTargetRow());
+        Assert.assertEquals(4, move.getTargetCol());
+    }
+
+
+    @Test
+    public void testSearcherCalculatesCorrectMoveInQuietPosition() {
+        chessEngine.updateBoard("r1bqk2r/ppp1bppp/2np1n2/4p3/2B1P3/2NP1N2/PPP2PPP/R1BQK2R w KQkq - 1 6");
+
+        Move move = chessEngine.calculateBestMove().move;
+
+        System.out.println(move);
+    }
+
+    @Test
+    public void testSearcherCalculatesCorrectCapture2() {
+        chessEngine.updateBoard("r2qr1k1/1bp2pp1/p2b1n1p/2pP4/2B1N2B/P7/1PPQ1PPP/3RR1K1 b - - 2 18");
+
+        Move move = chessEngine.calculateBestMove().move;
+
+        System.out.println(move);
+        Assert.assertEquals(PieceType.ROOK, move.getMovedPiece().getType());
+        Assert.assertEquals(PieceType.KNIGHT, move.getCapturedPiece().getType());
+        Assert.assertEquals(3, move.getTargetRow());
+        Assert.assertEquals(4, move.getTargetCol());
+    }
 
 
 

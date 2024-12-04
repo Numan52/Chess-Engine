@@ -295,7 +295,6 @@ public class Board {
             for (Piece piece : pieceRow) {
                 if (piece != null && piece.getIsWhite() != king.getIsWhite()) {
                     if (piece.canMoveTo(king.getRow(), king.getCol())) {
-                        System.out.println(piece + ": can capture King");
                         return true;
                     }
                 }

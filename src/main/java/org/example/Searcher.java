@@ -4,17 +4,25 @@ import java.util.List;
 
 public class Searcher {
     private Board board;
-    private int depth;
+    private int maxDepth;
     private PositionEvaluater positionEvaluater;
+    private int maxSearchTime;
+    private boolean isTimeUp;
 
-    public Searcher(Board board, int depth, PositionEvaluater positionEvaluater) {
+    public Searcher(Board board, int maxDepth, int maxSearchTime, PositionEvaluater positionEvaluater) {
         this.board = board;
-        this.depth = depth;
+        this.maxDepth = maxDepth;
+        this.maxSearchTime = maxSearchTime;
         this.positionEvaluater = positionEvaluater;
+        this.isTimeUp = false;
     }
 
     // includes alpha beta pruning
-    public MoveScore minimax(Board board, int depth, int alpha, int beta, boolean isWhitesTurn) {
+    public MoveScore minimax(Board board, int depth, int alpha, int beta, boolean isWhitesTurn, long startTime) {
+        if (isTimeUp || System.currentTimeMillis() - startTime >= maxSearchTime) {
+            this.isTimeUp = true;
+            return new MoveScore(null, 0);
+        }
         if (depth == 0 || board.isGameOver()) {
             return new MoveScore(null, positionEvaluater.evaluatePosition());
         }
@@ -26,7 +34,7 @@ public class Searcher {
             int maxEval = Integer.MIN_VALUE;
             for (Move move : possibleMoves) {
                 board.makeMove(move);
-                int eval = minimax(board, depth - 1, alpha, beta, false).score;
+                int eval = minimax(board, depth - 1, alpha, beta, false, startTime).score;
                 board.undoMove(move);
 
                 if (eval > maxEval) {
@@ -42,18 +50,17 @@ public class Searcher {
             return new MoveScore(bestMove, maxEval);
 
         } else {
-            System.out.print("Board State: ");
             List<Move> possibleMoves = board.getAllPossibleMoves();
 
             int minEval = Integer.MAX_VALUE;
             for (Move move : possibleMoves) {
                 board.makeMove(move);
-                int eval = minimax(board, depth - 1, alpha, beta, true).score;
+                int eval = minimax(board, depth - 1, alpha, beta, true, startTime).score;
                 board.undoMove(move);
 
                 if (eval < minEval) {
-                    minEval = Math.min(minEval, eval);
                     bestMove = move;
+                    minEval = eval;
                 }
 
                 beta = Math.min(beta, eval);
@@ -68,6 +75,28 @@ public class Searcher {
     }
 
     public MoveScore getBestMove() {
-        return minimax(board, depth, Integer.MIN_VALUE, Integer.MAX_VALUE, board.getIsWhitesTurn());
+        Move bestMove = null;
+        int bestScore = Integer.MIN_VALUE;
+
+        long startTime = System.currentTimeMillis();
+
+
+        for (int depth = 1; depth <= maxDepth; depth++) {
+            if (isTimeUp || System.currentTimeMillis() - startTime >= maxSearchTime) {
+                break;
+            }
+
+            MoveScore moveScore = minimax(board, depth, Integer.MIN_VALUE, Integer.MAX_VALUE, board.getIsWhitesTurn() , startTime);
+
+            if (!isTimeUp) {
+                bestMove = moveScore.move;
+                bestScore = moveScore.score;
+            } else {
+                System.out.println("times up: search cancelled at depth: " + depth );
+            }
+
+        }
+
+        return new MoveScore(bestMove, bestScore);
     }
 }

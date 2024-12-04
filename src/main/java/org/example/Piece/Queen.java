@@ -21,20 +21,16 @@ public class Queen extends Piece {
         int movedCols = Math.abs(targetCol - this.getCol());
 
         if (!isWithinBoard(targetRow, targetCol) || isFriendlyPiece(targetRow, targetCol)) {
-            System.out.println(this.toString() + ": cannot move: isFriendlyPiece");
             return false;
         }
         if (movedRows - movedCols == 0 && !isPieceBlockingDiagonal(targetRow, targetCol)) {
-            System.out.println(this.toString() + ": can move: diagonal");
             return true;
         }
         if ((targetRow == getRow() || targetCol == getCol()) &&
             !isPieceBlockingLine(targetRow, targetCol))
         {
-            System.out.println(this.toString() + ": can move: line");
             return true;
         }
-        System.out.println(this.toString() + ": cannot move to " + targetRow + ", " + targetCol );
         return false;
     }
 

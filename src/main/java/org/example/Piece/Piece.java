@@ -41,8 +41,6 @@ public abstract class Piece {
 
 
     public boolean isPieceBlockingDiagonal(int targetRow, int targetCol) {
-        System.out.println("TargetRow: " + targetRow);
-        System.out.println("TargetCol: " + targetCol);
         int rowDirection = targetRow > row ? 1 : -1;
         int colDirection = targetCol > col ? 1 : -1;
 
@@ -50,15 +48,13 @@ public abstract class Piece {
         int col = this.col + colDirection;
 
         while(row != targetRow && col != targetCol) {
-            System.out.println("row: " + row);
-            System.out.println("col: " + col);
             if (chessboard.getBoardState()[row][col] != null){
                 return true;
             }
             row += rowDirection;
             col += colDirection;
         }
-        System.out.println("finish");
+
         return false;
     }
 

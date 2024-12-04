@@ -51,7 +51,14 @@ public class ChessEngine {
 
 
     public MoveScore calculateBestMove() {
-        return searcher.getBestMove();
+        long start = System.currentTimeMillis();
+        MoveScore moveScore = searcher.getBestMove();
+        long finish = System.currentTimeMillis();
+
+        double timeElapsed = (double) (finish - start) / 1000;
+        System.out.println("Search time: " + timeElapsed);
+
+        return moveScore;
     }
 
     public void applyBestMove() {

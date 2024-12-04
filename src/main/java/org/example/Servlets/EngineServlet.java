@@ -17,7 +17,7 @@ import java.util.List;
 public class EngineServlet extends HttpServlet {
     private Board board = new Board();
     private PositionEvaluater positionEvaluater = new PositionEvaluater(board);
-    private Searcher searcher = new Searcher(board, 5, positionEvaluater);
+    private Searcher searcher = new Searcher(board, 4, 15, positionEvaluater);
     private ChessEngine chessEngine = new ChessEngine(board, searcher, positionEvaluater);
 
 
