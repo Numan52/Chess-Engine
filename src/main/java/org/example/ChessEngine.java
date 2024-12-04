@@ -21,12 +21,14 @@ public class ChessEngine {
         Piece[][] boardState = BoardParser.fenToBoardState(board, fen);
         boolean isWhitesTurn = BoardParser.parseIsWhitesTurn(fen);
         String enPassantField = BoardParser.getEnPassantField(fen);
-        boolean isKingInCheck = board.isKingInCheck(board.getKing(isWhitesTurn));
 
         board.setBoardState(boardState);
         board.setIsWhitesTurn(isWhitesTurn);
         board.setEnPassantField(enPassantField);
+
+        boolean isKingInCheck = board.isKingInCheck(board.getKing(isWhitesTurn));
         board.setIsKingInCheck(isKingInCheck);
+
         updateCastlingRights(fen);
 
     }

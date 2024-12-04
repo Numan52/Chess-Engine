@@ -1,6 +1,7 @@
 package org.example;
 
 import org.example.Piece.*;
+import org.example.Utils.BoardParser;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -17,6 +18,7 @@ public class Board {
     private boolean isWhitesTurn;
     private Move lastMove;
     private String enPassantField;
+    private boolean isKingInCheck;
 
 
     public Board() {
@@ -110,21 +112,69 @@ public class Board {
             for (Piece piece : pieceRow) {
                 if (piece != null && piece.getIsWhite() == isWhitesTurn) {
                     moves.addAll(piece.generatePossibleMoves());
+
                 }
             }
         }
+
+        List<Move> movesToRemove = new ArrayList<>();
+        for (Move move : moves) {
+            boolean isWhitesMove = move.getMovedPiece().getIsWhite();
+            King king = (King) getKing(isWhitesMove);
+            this.makeMove(move);
+
+            if (isKingInCheck(king)){
+                movesToRemove.add(move);
+            }
+
+            this.undoMove(move);
+        }
+
+        moves.removeAll(movesToRemove);
+
         return moves;
     }
 
 
     public void makeMove(Move move) {
         this.boardState[move.getStartRow()][move.getStartCol()] = null;
-        this.boardState[move.getTargetCol()][move.getTargetCol()] = move.getMovedPiece();
+        this.boardState[move.getTargetRow()][move.getTargetCol()] = move.getMovedPiece();
 
-        //TODO: remove captured piece after en passant
         move.getMovedPiece().setMoveCount(move.getMovedPiece().getMoveCount() + 1);
         move.getMovedPiece().setRow(move.getTargetRow());
         move.getMovedPiece().setCol(move.getTargetCol());
+
+        // handle en passant
+        if (move.isEnPassant()) {
+            int direction = move.getMovedPiece().getIsWhite() ? -1 : 1;
+            this.boardState[move.getTargetRow() + direction][move.getTargetCol()] = null;
+        }
+
+        // Handle castling
+        if (move.isCastling()) {
+            int rookStartCol = (move.getTargetCol() == 2) ? 0 : 7;
+            int rookEndCol = (move.getTargetCol() == 2) ? 3 : 5;
+
+            Piece rook = this.boardState[move.getTargetRow()][rookStartCol];
+            this.boardState[move.getTargetRow()][rookStartCol] = null;
+            this.boardState[move.getTargetRow()][rookEndCol] = rook;
+
+            rook.setCol(rookEndCol);
+//            rook.setMoveCount(rook.getMoveCount() + 1);
+        }
+
+        // handle promotion
+        if (move.getPromotionPiece() != null) {
+            char pieceColor = move.getMovedPiece().getIsWhite() ? 'w' : 'b';
+            char type = move.getPromotionPiece() == PieceType.KNIGHT ?
+                    'N' : Character.toUpperCase(move.getMovedPiece().getType().toString().charAt(0));
+
+            Piece promotionPiece = BoardParser.createPiece(this, move.getTargetRow(), move.getTargetCol(), pieceColor, type);
+            this.boardState[move.getTargetRow()][move.getTargetCol()] = promotionPiece;
+            promotionPiece.setRow(move.getTargetRow());
+            promotionPiece.setCol(move.getTargetCol());
+            promotionPiece.setMoveCount(1); // Promotion counts as the first move
+        }
 
         this.moveHistory.push(move);
         this.lastMove = move;
@@ -132,13 +182,21 @@ public class Board {
     }
 
 
+
+
     public void undoMove(Move move) {
         this.boardState[move.getStartRow()][move.getStartCol()] = move.getMovedPiece();
         this.boardState[move.getTargetRow()][move.getTargetCol()] = move.getCapturedPiece();
-        //TODO: restore captured piece after en passant
+
         move.getMovedPiece().setRow(move.getStartRow());
         move.getMovedPiece().setCol(move.getStartCol());
         move.getMovedPiece().setMoveCount(move.getMovedPiece().getMoveCount() - 1);
+
+        // Restore en passant capture
+        if (move.isEnPassant()) {
+            int direction = move.getMovedPiece().getIsWhite() ? -1 : 1;
+            this.boardState[move.getTargetRow() + direction][move.getTargetCol()] = move.getCapturedPiece();
+        }
 
         // Handle castling
         if (move.isCastling()) {
@@ -154,6 +212,15 @@ public class Board {
             rook.setMoveCount(rook.getMoveCount() - 1);
         }
 
+        // Restore promotion
+        if (move.getPromotionPiece() != null) {
+            // Replace the promoted piece with the original pawn
+            Piece originalPawn = move.getMovedPiece();
+            this.boardState[move.getTargetRow()][move.getTargetCol()] = null;
+            this.boardState[move.getStartRow()][move.getStartCol()] = originalPawn;
+
+        }
+
         if (!this.moveHistory.isEmpty()) {
             this.moveHistory.pop();
         }
@@ -165,6 +232,42 @@ public class Board {
         }
 
         setIsWhitesTurn(!getIsWhitesTurn());
+    }
+
+
+    public boolean isKingInCheck(Piece king) {
+        for (Piece[] pieceRow : this.boardState) {
+            for (Piece piece : pieceRow) {
+                if (piece != null && piece.getIsWhite() != king.getIsWhite()) {
+                    if (piece.canMoveTo(king.getRow(), king.getCol())) {
+                        System.out.println(piece + ": can capture King");
+                        return true;
+                    }
+                }
+            }
+        }
+        return false;
+    }
+
+
+    public Piece getKing(boolean isWhite) {
+        for (Piece[] pieceRow : getBoardState()) {
+            for (Piece piece : pieceRow) {
+                if (piece != null) {
+                    if (isWhite) {
+                        if (piece.getType() == PieceType.KING && piece.getIsWhite()) {
+                            return piece;
+                        }
+                    }
+                    else {
+                        if (piece.getType() == PieceType.KING && !piece.getIsWhite()) {
+                            return piece;
+                        }
+                    }
+                }
+            }
+        }
+        return null;
     }
 
 
@@ -185,33 +288,12 @@ public class Board {
         this.boardState = boardState;
     }
 
-    public Piece[][] createBoardStateCopy() {
-        int arrayLength = getBoardState().length;
-        Piece[][] boardStateCopy = new Piece[arrayLength][arrayLength];
-        for (int i = 0; i < arrayLength; i++) {
-            boardStateCopy[i] = Arrays.copyOf(getBoardState()[i], arrayLength);
-        }
-        return boardStateCopy;
+    public boolean getIsKingInCheck() {
+        return isKingInCheck;
     }
 
-    public Piece getKing(boolean isWhite) {
-        for (Piece[] pieceRow : getBoardState()) {
-            for (Piece piece : pieceRow) {
-                if (piece != null) {
-                    if (isWhite) {
-                        if (piece.getType() == PieceType.KING && piece.getIsWhite()) {
-                            return piece;
-                        }
-                    }
-                    else {
-                        if (piece.getType() == PieceType.KING && !piece.getIsWhite()) {
-                            return piece;
-                        }
-                    }
-                }
-            }
-        }
-        return null;
+    public void setIsKingInCheck(boolean isKingInCheck) {
+        this.isKingInCheck = isKingInCheck;
     }
 
     public Move getLastMove() {
