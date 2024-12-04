@@ -7,7 +7,7 @@
 
     <servlet>
         <servlet-name>EngineServlet</servlet-name>
-        <servlet-class>org.example.EngineServlet</servlet-class>
+        <servlet-class>org.example.Servlets.EngineServlet</servlet-class>
     </servlet>
 
     <servlet-mapping>

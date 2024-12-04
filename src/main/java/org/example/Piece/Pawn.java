@@ -2,7 +2,7 @@ package org.example.Piece;
 
 
 import org.example.Board;
-import org.example.ChessUtils;
+import org.example.Utils.ChessUtils;
 import org.example.Move;
 
 import java.util.ArrayList;
@@ -20,12 +20,20 @@ public class Pawn extends Piece {
     public boolean canMoveTo(int targetRow, int targetCol) {
         int movedRows = Math.abs(targetRow - this.getRow());
         int movedCols = Math.abs(targetCol - this.getCol());
+        int startingRow = this.getIsWhite() ? 1 : 6;
 
         if (!isWithinBoard(targetRow, targetCol) || isFriendlyPiece(targetRow, targetCol)) {
             return false;
         }
 
-        Piece pieceAtTargetLocation = this.getChessboard().getBoardState()[targetRow][targetCol];
+        // check en passant
+        if (!getChessboard().getEnPassantField().equals("-")) {
+            int enPassantRow = calculateEnPassantRow();
+            int enPassantCol = calculateEnPassantCol();
+            System.out.println(enPassantRow + " " + enPassantCol);
+
+        }
+
 
         if ((targetRow <= this.getRow() && getIsWhite()) ||
             (targetRow >= this.getRow() && !getIsWhite()) ||
@@ -34,12 +42,14 @@ public class Pawn extends Piece {
             return false;
         }
 
+        Piece pieceAtTargetLocation = this.getChessboard().getBoardState()[targetRow][targetCol];
+
         // 1 square forward
         if (movedRows == 1 && movedCols == 0 && pieceAtTargetLocation == null) {
             return true;
         }
         // 2 squares forward
-        if (movedRows == 2 && getMoveCount() == 0 && pieceAtTargetLocation == null && !isPieceBlockingLine(targetRow, targetCol)) {
+        if (movedRows == 2 && this.getRow() == startingRow && pieceAtTargetLocation == null && !isPieceBlockingLine(targetRow, targetCol)) {
             return true;
         }
         if (pieceAtTargetLocation != null && movedRows == 1 && movedCols == 1 ) {
@@ -58,7 +68,7 @@ public class Pawn extends Piece {
         List<Move> possibleMoves = new ArrayList<>();
         possibleMoves.addAll(generateForwardMoves());
         possibleMoves.addAll(generateCaptures());
-        possibleMoves.add(generateEnPassantMove());
+        possibleMoves.addAll(generateEnPassantMove());
 
         return possibleMoves;
     }
@@ -130,25 +140,40 @@ public class Pawn extends Piece {
     }
 
     // enPassantField is the field that the pawn will land in if after performing en passant (eg. f3)
-    public Move generateEnPassantMove() {
+    public List<Move> generateEnPassantMove() {
+        List<Move> possibleEnPassantMoves = new ArrayList<>();
 
-        int direction = this.getIsWhite() ? 1 : -1;
-        // TODO: Check if en passant moves are generated when available
         // no en passant possible
         if (this.getChessboard().getEnPassantField().equals("-")) {
-            return null;
+            return List.of();
         }
 
-        int enPassantCol = (int) this.getChessboard().getEnPassantField().charAt(0) - (int) 'a';
+        int enPassantRow = calculateEnPassantRow();
+        int enPassantCol = calculateEnPassantCol();
+        int direction = this.getIsWhite() ? -1 : 1;
+        int opponentPawnRow = enPassantRow + direction;
 
-        Piece capturedPiece = this.getChessboard().getBoardState()[this.getRow()][enPassantCol];
-        return new Move(
-                this.getRow(), this.getCol(), this.getRow() + direction, enPassantCol, this, capturedPiece,
-                false, true, null
-        );
+        if (this.getRow() == opponentPawnRow &&
+                (this.getCol() == enPassantCol - 1 || this.getCol() == enPassantCol + 1)) {
 
+            System.out.println("en passant: " + this);
+            Piece capturedPiece = this.getChessboard().getBoardState()[this.getRow()][enPassantCol];
+            possibleEnPassantMoves.add(new Move(
+                            this.getRow(), this.getCol(), enPassantRow, enPassantCol, this, capturedPiece,
+                            false, true, null
+                            )
+            );
+        }
 
+        return possibleEnPassantMoves;
+    }
 
+    private int calculateEnPassantRow() {
+        return Character.getNumericValue(this.getChessboard().getEnPassantField().charAt(1)) - 1;
+    }
+
+    private int calculateEnPassantCol() {
+        return this.getChessboard().getEnPassantField().charAt(0) - (int) 'a';
     }
 
 
@@ -165,7 +190,7 @@ public class Pawn extends Piece {
 
     @Override
     public String toString() {
-        return "type='" + getType() + '\'' +
+        return "{ type='" + getType() + '\'' +
                 ", isWhite=" + getIsWhite() +
                 ", x=" + getRow() +
                 ", y=" + getCol() +

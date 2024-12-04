@@ -54,7 +54,7 @@ public class Queen extends Piece {
 
     @Override
     public String toString() {
-        return "type='" + getType() + '\'' +
+        return "{ type='" + getType() + '\'' +
                 ", isWhite=" + getIsWhite() +
                 ", x=" + getRow() +
                 ", y=" + getCol() +

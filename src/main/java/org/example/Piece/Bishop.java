@@ -23,6 +23,8 @@ public class Bishop extends Piece {
         if (!isWithinBoard(targetRow, targetCol) || isFriendlyPiece(targetRow, targetCol)) {
             return false;
         }
+
+
         if (movedRows - movedCols == 0 &&
             !isPieceBlockingDiagonal(targetRow, targetCol))
         {
@@ -46,7 +48,7 @@ public class Bishop extends Piece {
 
     @Override
     public String toString() {
-        return "type='" + getType() + '\'' +
+        return "{ type='" + getType() + '\'' +
                 ", isWhite=" + getIsWhite() +
                 ", x=" + getRow() +
                 ", y=" + getCol() +
