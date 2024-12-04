@@ -50,16 +50,16 @@ public class ChessEngine {
     }
 
 
-    public Move calculateBestMove() {
+    public MoveScore calculateBestMove() {
         return searcher.getBestMove();
     }
 
     public void applyBestMove() {
-        Move move = calculateBestMove();
-        board.makeMove(move);
+        MoveScore moveScore = calculateBestMove();
+        board.makeMove(moveScore.move);
 
         System.out.println();
-        System.out.println("Best move: " + move);
+        System.out.println("Best move: " + moveScore.move + ", " + moveScore.score);
     }
 
     public Board getBoard() {

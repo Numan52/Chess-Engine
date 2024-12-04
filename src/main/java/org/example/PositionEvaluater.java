@@ -5,13 +5,14 @@ import org.example.Piece.PieceType;
 
 public class PositionEvaluater {
     private Board board;
-    private int evaluation;
+
 
     public PositionEvaluater(Board board) {
         this.board = board;
     }
 
     public int evaluatePosition() {
+        int evaluation = 0;
         for (Piece[] piecesRow : board.getBoardState()) {
             for (Piece piece : piecesRow) {
                 if (piece != null && piece.getType() != PieceType.KING) {
@@ -24,6 +25,6 @@ public class PositionEvaluater {
                 }
             }
         }
-        return 0;
+        return evaluation;
     }
 }

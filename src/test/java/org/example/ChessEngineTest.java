@@ -60,6 +60,18 @@ public class ChessEngineTest {
 
 
     @Test
+    public void testGenerateAllMovesNormalPosition2() {
+        chessEngine.updateBoard("rnbqkbnr/ppp1p1pp/5p2/3pN3/4P3/8/PPPP1PPP/RNBQKB1R b KQkq - 1 3");
+
+        List<Move> possibleMoves = board.getAllPossibleMoves();
+        for (Move move : possibleMoves) {
+            System.out.println(move);
+        }
+        Assert.assertEquals(26, possibleMoves.size());
+    }
+
+
+    @Test
     public void testGenerateAllMovesEnPassantPossible() {
         chessEngine.updateBoard("rnbqkbnr/ppp1pppp/8/8/2PpP3/7P/PP1P1PP1/RNBQKBNR b KQkq c3 0 3");
 

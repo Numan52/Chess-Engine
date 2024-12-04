@@ -67,7 +67,7 @@ public class Searcher {
 
     }
 
-    public Move getBestMove() {
-        return minimax(board, depth, Integer.MIN_VALUE, Integer.MAX_VALUE, board.getIsWhitesTurn()).move;
+    public MoveScore getBestMove() {
+        return minimax(board, depth, Integer.MIN_VALUE, Integer.MAX_VALUE, board.getIsWhitesTurn());
     }
 }
