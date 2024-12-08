@@ -3,10 +3,7 @@ package org.example;
 import org.example.Piece.*;
 import org.example.Utils.BoardParser;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Stack;
+import java.util.*;
 
 public class Board {
 
@@ -119,6 +116,28 @@ public class Board {
             }
         }
 
+        removeIllegalMoves(moves);
+        sortMovesByCapture(moves);
+
+        return moves;
+    }
+
+
+   private void sortMovesByCapture(List<Move> moves) {
+        moves.sort((move1, move2) -> {
+            if (move1.getCapturedPiece() != null && move2.getCapturedPiece() == null) {
+                return -1; // move1 first
+            } else if (move1.getCapturedPiece() == null && move2.getCapturedPiece() != null) {
+                return 1; // move2 second
+            } else {
+                return 0;
+            }
+        });
+
+   }
+
+
+    private void removeIllegalMoves(List<Move> moves) {
         List<Move> movesToRemove = new ArrayList<>();
         for (Move move : moves) {
             boolean isWhitesMove = move.getMovedPiece().getIsWhite();
@@ -133,8 +152,6 @@ public class Board {
         }
 
         moves.removeAll(movesToRemove);
-
-        return moves;
     }
 
 

@@ -25,7 +25,7 @@ public class ChessEngineTest {
     public void setUp() {
         board = new Board();
         positionEvaluater = new PositionEvaluater(board);
-        searcher = new Searcher(board, 5, 10000, positionEvaluater);
+        searcher = new Searcher(board, 7, 30000, positionEvaluater);
         chessEngine = new ChessEngine(board, searcher, positionEvaluater);
     }
 
@@ -110,6 +110,37 @@ public class ChessEngineTest {
 
 
     @Test
+    public void testMakeAndUndoMove() {
+        chessEngine.updateBoard("rnbqkbnr/ppp1p2p/5pp1/4N3/4p3/5Q2/PPPP1PPP/RNB1KB1R w KQkq - 0 5");
+        Queen queen = board.getQueen(true);
+        Pawn capturedPawn = (Pawn) board.getBoardState()[3][4];
+
+        Assert.assertEquals(2, queen.getRow());
+        Assert.assertEquals(5, queen.getCol());
+        Assert.assertEquals(queen, board.getBoardState()[2][5]);
+
+
+        Move move = new Move(2, 5, 3, 4, queen, capturedPawn, false, false, null );
+        board.makeMove(move);
+
+        Assert.assertEquals(3, queen.getRow());
+        Assert.assertEquals(4, queen.getCol());
+        Assert.assertEquals(queen, board.getBoardState()[3][4]);
+
+        board.undoMove(move);
+
+        Assert.assertEquals(2, queen.getRow());
+        Assert.assertEquals(5, queen.getCol());
+        Assert.assertEquals(queen, board.getBoardState()[2][5]);
+
+        Assert.assertEquals(3, capturedPawn.getRow());
+        Assert.assertEquals(4, capturedPawn.getCol());
+        Assert.assertEquals(capturedPawn, board.getBoardState()[3][4]);
+        Assert.assertEquals(capturedPawn, board.getBoardState()[3][4]);
+    }
+
+
+    @Test
     public void testSearcherCalculatesCorrectCapture() {
         chessEngine.updateBoard("rnbqkbnr/ppp1p1pp/5p2/3pN3/4P3/8/PPPP1PPP/RNBQKB1R b KQkq - 1 3");
 
@@ -147,33 +178,14 @@ public class ChessEngineTest {
 
 
     @Test
-    public void testMakeAndUndoMove() {
-        chessEngine.updateBoard("rnbqkbnr/ppp1p2p/5pp1/4N3/4p3/5Q2/PPPP1PPP/RNB1KB1R w KQkq - 0 5");
-        Queen queen = board.getQueen(true);
-        Pawn capturedPawn = (Pawn) board.getBoardState()[3][4];
+    public void testPieceSquareTableAffectsEvaluation() {
+        chessEngine.updateBoard("r1b1k2r/ppp2ppp/4pn2/2q1b3/P2n3N/2NP3P/1PPQ1PP1/R1B1KB1R b KQkq - 0 10");
 
-        Assert.assertEquals(2, queen.getRow());
-        Assert.assertEquals(5, queen.getCol());
-        Assert.assertEquals(queen, board.getBoardState()[2][5]);
+        int evaluation = positionEvaluater.evaluatePosition();
+        System.out.println(evaluation);
 
+        Assert.assertTrue(evaluation < -0.5);
 
-        Move move = new Move(2, 5, 3, 4, queen, capturedPawn, false, false, null );
-        board.makeMove(move);
-
-        Assert.assertEquals(3, queen.getRow());
-        Assert.assertEquals(4, queen.getCol());
-        Assert.assertEquals(queen, board.getBoardState()[3][4]);
-
-        board.undoMove(move);
-
-        Assert.assertEquals(2, queen.getRow());
-        Assert.assertEquals(5, queen.getCol());
-        Assert.assertEquals(queen, board.getBoardState()[2][5]);
-
-        Assert.assertEquals(3, capturedPawn.getRow());
-        Assert.assertEquals(4, capturedPawn.getCol());
-        Assert.assertEquals(capturedPawn, board.getBoardState()[3][4]);
-        Assert.assertEquals(capturedPawn, board.getBoardState()[3][4]);
     }
 
 
