@@ -33,6 +33,25 @@ public class Knight extends Piece {
     }
 
     @Override
+    public int[][] getPieceSquareTable() {
+        return new int[][] {
+                {-50, -40, -30, -30, -30, -30, -40, -50},
+                {-40, -20, 0, 0, 0, 0, -20, -40},
+                {-30, 0, 10, 15, 15, 10, 0, -30},
+                {-30, 5, 15, 20, 20, 15, 5, -30},
+                {-30, 5, 15, 20, 20, 15, 5, -30},
+                {-30, 0, 10, 15, 15, 10, 0, -30},
+                {-40, -20, 0, 5, 5, 0, -20, -40},
+                {-50, -40, -30, -30, -30, -30, -40, -50}
+        };
+    }
+
+    @Override
+    public int[][] getPieceSquareTable(boolean isEndgame) {
+        return getPieceSquareTable();
+    }
+
+    @Override
     public List<Move> generatePossibleMoves() {
         int[][] squares = {{2, 1}, {1, 2}, {-1, 2}, {-2, 1}, {-2, -1}, {-1, -2}, {1, -2}, {2, -1}};
         return super.generateFixedMoves(squares);

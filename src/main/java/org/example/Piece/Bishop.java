@@ -34,6 +34,25 @@ public class Bishop extends Piece {
     }
 
     @Override
+    public int[][] getPieceSquareTable() {
+        return new int[][] {
+                {-20, -10, -10, -10, -10, -10, -10, -20},
+                {-10, 0, 0, 0, 0, 0, 0, -10},
+                {-10, 0, 5, 10, 10, 5, 0, -10},
+                {-10, 5, 5, 10, 10, 5, 5, -10},
+                {-10, 5, 5, 10, 10, 5, 5, -10},
+                {-10, 0, 5, 10, 10, 5, 0, -10},
+                {-10, 0, 0, 0, 0, 0, 0, -10},
+                {-20, -10, -10, -10, -10, -10, -10, -20}
+        };
+    }
+
+    @Override
+    public int[][] getPieceSquareTable(boolean isEndgame) {
+        return getPieceSquareTable();
+    }
+
+    @Override
     public List<Move> generatePossibleMoves() {
         int[][] directions = {{1, 1}, {1, -1}, {-1, -1}, {-1, 1}};
         return super.generateDirectionalMoves(directions);

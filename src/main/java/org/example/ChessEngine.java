@@ -1,5 +1,6 @@
 package org.example;
 
+import org.example.Evaluation.PositionEvaluater;
 import org.example.Piece.King;
 import org.example.Piece.Piece;
 import org.example.Piece.PieceType;
@@ -24,14 +25,14 @@ public class ChessEngine {
 
         board.setBoardState(boardState);
         board.setIsWhitesTurn(isWhitesTurn);
-        board.setEnPassantField(enPassantField); // TODO: NEED TO HANDLE MANUALLY DURING SEARCH
+        board.setEnPassantField(enPassantField);
 
 
         updateCastlingRights(fen);
 
     }
 
-    // TODO: NEED TO HANDLE MANUALLY DURING SEARCH
+
     public void updateCastlingRights(String fen) {
         for (Piece[] piecesRow : board.getBoardState()) {
             for (Piece piece : piecesRow) {

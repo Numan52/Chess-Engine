@@ -106,6 +106,8 @@ public class Board {
     }
 
 
+    // TODO: HANDLE MOVES THAT LEAD TO CHECKMATE
+
     public List<Move> getAllPossibleMoves() {
         List<Move> moves = new ArrayList<>();
         for (Piece[] pieceRow : getBoardState()) {
@@ -316,6 +318,27 @@ public class Board {
                     else {
                         if (piece.getType() == PieceType.KING && !piece.getIsWhite()) {
                             return (King) piece;
+                        }
+                    }
+                }
+            }
+        }
+        return null;
+    }
+
+
+    public Queen getQueen(boolean isWhite) {
+        for (Piece[] pieceRow : getBoardState()) {
+            for (Piece piece : pieceRow) {
+                if (piece != null) {
+                    if (isWhite) {
+                        if (piece.getType() == PieceType.QUEEN && piece.getIsWhite()) {
+                            return (Queen) piece;
+                        }
+                    }
+                    else {
+                        if (piece.getType() == PieceType.QUEEN && !piece.getIsWhite()) {
+                            return (Queen) piece;
                         }
                     }
                 }

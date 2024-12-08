@@ -26,7 +26,8 @@ public abstract class Piece {
 
     public abstract boolean canMoveTo(int row, int col);
 
-
+    public abstract int[][] getPieceSquareTable();
+    public abstract int[][] getPieceSquareTable(boolean isEndgame);
     public abstract List<Move> generatePossibleMoves();
 
     public boolean isWithinBoard(int targetRow, int targetCol) {

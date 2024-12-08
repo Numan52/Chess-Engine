@@ -8,6 +8,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class King extends Piece {
+    private static final int VALUE = 0;
     private boolean hasKingsideCastlingRight = true;
     private boolean hasQueensideCastlingRight = true;
 
@@ -15,7 +16,7 @@ public class King extends Piece {
         super(chessboard, x, y, isWhite, PieceType.KING);
     }
 
-    // TODO: NEED TO TRACK MANUALLY IF KING CAN CASTLE BECAUSE OF THE SEARCH. SAME GOES FOR EN PASSANT
+
     @Override
     public boolean canMoveTo(int targetRow, int targetCol) {
         if (!isWithinBoard(targetRow, targetCol) || isFriendlyPiece(targetRow, targetCol)) {
@@ -39,6 +40,40 @@ public class King extends Piece {
         }
 
         return false;
+
+    }
+
+    @Override
+    public int[][] getPieceSquareTable() {
+        return new int[][] {
+                {-30, -40, -40, -50, -50, -40, -40, -30},
+                {-30, -40, -40, -50, -50, -40, -40, -30},
+                {-30, -40, -40, -50, -50, -40, -40, -30},
+                {-30, -40, -40, -50, -50, -40, -40, -30},
+                {-20, -30, -30, -40, -40, -30, -30, -20},
+                {-10, -20, -20, -20, -20, -20, -20, -10},
+                {20, 20, 0, 0, 0, 0, 20, 20},
+                {20, 30, 10, 0, 0, 10, 30, 20}
+        };
+    }
+
+
+    @Override
+    public int[][] getPieceSquareTable(boolean isEndgame) {
+        if (isEndgame) {
+            return new int[][] {
+                    {-50, -30, -30, -30, -30, -30, -30, -50},
+                    {-30, -10, 0, 0, 0, 0, -10, -30},
+                    {-30, 0, 10, 15, 15, 10, 0, -30},
+                    {-30, 0, 15, 20, 20, 15, 0, -30},
+                    {-30, 0, 15, 20, 20, 15, 0, -30},
+                    {-30, 0, 10, 15, 15, 10, 0, -30},
+                    {-30, -10, 0, 0, 0, 0, -10, -30},
+                    {-50, -30, -30, -30, -30, -30, -30, -50}
+            };
+        } else {
+            return getPieceSquareTable();
+        }
 
     }
 
@@ -171,7 +206,7 @@ public class King extends Piece {
 
     @Override
     public int getValue() {
-        return 0;
+        return VALUE;
     }
 
 
