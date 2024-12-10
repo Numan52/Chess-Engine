@@ -19,6 +19,9 @@ public class Main {
                 {5, 10, 10, -20, -20, 10, 10, 5},
                 {0, 0, 0, 0, 0, 0, 0, 0}
         };
-        System.out.print(array[6][1]);
+        System.out.println(array[6][1]);
+
+        Move[][] array2 = new Move[6][2];
+        System.out.println(array2[5][0]);
     }
 }

@@ -25,6 +25,7 @@ public class EngineServlet extends HttpServlet {
     // fen should have the following form: rnb1kbnr/ppp2ppp/8/3Np1q1/8/5N2/PPPPPPPP/R1BQKB1R w KQkq e6 1 4
     @Override
     public void doPost(HttpServletRequest request, HttpServletResponse response) throws IOException {
+
         Gson gson = new Gson();
         StringBuilder jsonBody = new StringBuilder();
 
@@ -57,7 +58,7 @@ public class EngineServlet extends HttpServlet {
        chessEngine.updateBoard(fen);
 
 
-        List<Move> moves = board.getAllPossibleMoves();
+        List<Move> moves = board.getAllPossibleMoves(0);
 
 //        for (Move move : moves) {
 //            System.out.println(move.toString());

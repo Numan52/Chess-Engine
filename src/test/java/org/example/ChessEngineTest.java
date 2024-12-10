@@ -57,7 +57,7 @@ public class ChessEngineTest {
     public void testGenerateAllMovesNormalPosition() {
         chessEngine.updateBoard("rnbqkbnr/pppp1ppp/8/4p3/8/4P3/PPPP1PPP/RNBQKBNR w KQkq - 0 2");
 
-        List<Move> possibleMoves = board.getAllPossibleMoves();
+        List<Move> possibleMoves = board.getAllPossibleMoves(0);
 
         Assert.assertEquals(30, possibleMoves.size());
     }
@@ -67,7 +67,7 @@ public class ChessEngineTest {
     public void testGenerateAllMovesNormalPosition2() {
         chessEngine.updateBoard("rnbqkbnr/ppp1p1pp/5p2/3pN3/4P3/8/PPPP1PPP/RNBQKB1R b KQkq - 1 3");
 
-        List<Move> possibleMoves = board.getAllPossibleMoves();
+        List<Move> possibleMoves = board.getAllPossibleMoves(0);
         for (Move move : possibleMoves) {
             System.out.println(move);
         }
@@ -79,7 +79,7 @@ public class ChessEngineTest {
     public void testGenerateAllMovesEnPassantPossible() {
         chessEngine.updateBoard("rnbqkbnr/ppp1pppp/8/8/2PpP3/7P/PP1P1PP1/RNBQKBNR b KQkq c3 0 3");
 
-        List<Move> possibleMoves = board.getAllPossibleMoves();
+        List<Move> possibleMoves = board.getAllPossibleMoves(0);
 
         Assert.assertEquals(30, possibleMoves.size());
     }
@@ -93,7 +93,7 @@ public class ChessEngineTest {
             }
         }
         System.out.println("length: " + board.getBoardState()[1].length);
-        List<Move> possibleMoves = board.getAllPossibleMoves();
+        List<Move> possibleMoves = board.getAllPossibleMoves(0);
         for (Move move : possibleMoves) {
             System.out.println(move);
         }
@@ -104,7 +104,7 @@ public class ChessEngineTest {
     @Test
     public void testUpdateBoardCorrectlySetsBoardState() {
         chessEngine.updateBoard("rnbqkbnr/pppp1Bp1/7p/4p3/4P3/8/PPPP1PPP/RNBQK1NR b KQkq - 0 3");
-        List<Move> possibleMoves = board.getAllPossibleMoves();
+        List<Move> possibleMoves = board.getAllPossibleMoves(0);
         Assert.assertEquals(2, possibleMoves.size());
     }
 
@@ -148,6 +148,11 @@ public class ChessEngineTest {
         System.out.println("Move: " + moveScore.move + " ,Score: " + moveScore.score);
         System.out.println();
         System.out.println("Path: " + moveScore.movePath);
+
+        for (Move move : moveScore.movePath) {
+            System.out.println(move);
+        }
+
         Assert.assertEquals(PieceType.KNIGHT, moveScore.move.getCapturedPiece().getType());
         Assert.assertEquals(4, moveScore.move.getTargetRow());
         Assert.assertEquals(4, moveScore.move.getTargetCol());

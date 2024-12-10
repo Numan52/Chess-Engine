@@ -11,6 +11,7 @@ public class Searcher {
     private PositionEvaluater positionEvaluater;
     private int maxSearchTime;
     private boolean isTimeUp;
+    private Move[][] killerMoves;
 
 
     public Searcher(Board board, int maxDepth, int maxSearchTime, PositionEvaluater positionEvaluater) {
@@ -19,10 +20,11 @@ public class Searcher {
         this.maxSearchTime = maxSearchTime;
         this.positionEvaluater = positionEvaluater;
         this.isTimeUp = false;
-
+        this.killerMoves = new Move[maxDepth + 1][2]; // 2 Killer moves per depth
+        board.setSearcher(this);
     }
 
-    // includes alpha beta pruning
+
     public MoveScore minimax(Board board, int depth, int alpha, int beta, boolean isWhitesTurn, long startTime) {
         if (isTimeUp || System.currentTimeMillis() - startTime >= maxSearchTime) {
             this.isTimeUp = true;
@@ -37,7 +39,7 @@ public class Searcher {
         List<Move> bestPath = new ArrayList<>();
 
         if (isWhitesTurn) {
-            List<Move> possibleMoves = board.getAllPossibleMoves();
+            List<Move> possibleMoves = board.getAllPossibleMoves(depth);
             int maxEval = Integer.MIN_VALUE;
             for (Move move : possibleMoves) {
                 board.makeMove(move);
@@ -53,6 +55,9 @@ public class Searcher {
 
                 alpha = Math.max(alpha, childScore.score);
                 if (beta <= alpha) {
+                    if (move.getCapturedPiece() == null) {
+                        addKillerMove(move, depth);
+                    }
                     break;
                 }
             }
@@ -60,7 +65,7 @@ public class Searcher {
             return new MoveScore(bestMove, maxEval, bestPath);
 
         } else {
-            List<Move> possibleMoves = board.getAllPossibleMoves();
+            List<Move> possibleMoves = board.getAllPossibleMoves(depth);
 
             int minEval = Integer.MAX_VALUE;
             for (Move move : possibleMoves) {
@@ -77,6 +82,9 @@ public class Searcher {
 
                 beta = Math.min(beta, childScore.score);
                 if (beta <= alpha) {
+                    if (move.getCapturedPiece() == null) {
+                        addKillerMove(move, depth);
+                    }
                     break;
                 }
 
@@ -86,6 +94,20 @@ public class Searcher {
         }
 
     }
+
+
+    private void addKillerMove(Move move, int depth) {
+        if (killerMoves[depth][0] == null || !killerMoves[depth][0].equals(move)) {
+            killerMoves[depth][1] = killerMoves[depth][0];
+            killerMoves[depth][0] = move;
+        }
+    }
+
+    public boolean isKillerMove(Move move, int depth) {
+        return (killerMoves[depth][0] != null && killerMoves[depth][0].equals(move)) ||
+                (killerMoves[depth][1] != null && killerMoves[depth][1].equals(move));
+    }
+
 
     public MoveScore getBestMove() {
         Move bestMove = null;
@@ -117,4 +139,7 @@ public class Searcher {
     }
 
 
+    public Move[][] getKillerMoves() {
+        return killerMoves;
+    }
 }

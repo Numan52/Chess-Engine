@@ -16,13 +16,14 @@ public class Board {
     private Move lastMove;
     private String enPassantField;
     private int castlingRights; // 4 bits - qkQK
-
+    private Searcher searcher;
 
     public Board() {
         createChessboard();
         this.lastMove = null;
         this.isGameOver = false;
         this.isWhitesTurn = true;
+
     }
 
 
@@ -105,25 +106,57 @@ public class Board {
 
     // TODO: HANDLE MOVES THAT LEAD TO CHECKMATE
 
-    public List<Move> getAllPossibleMoves() {
-        List<Move> moves = new ArrayList<>();
+    public List<Move> getAllPossibleMoves(int depth) {
+        List<Move> allMoves = new ArrayList<>();
         for (Piece[] pieceRow : getBoardState()) {
             for (Piece piece : pieceRow) {
                 if (piece != null && piece.getIsWhite() == isWhitesTurn) {
-                    moves.addAll(piece.generatePossibleMoves());
-
+                    allMoves.addAll(piece.generatePossibleMoves());
                 }
             }
         }
 
-        removeIllegalMoves(moves);
-        sortMovesByCapture(moves);
+        removeIllegalMoves(allMoves);
 
-        return moves;
+        List<Move> captures = new ArrayList<>();
+        List<Move> quietMoves = new ArrayList<>();
+
+        for (Move move : allMoves) {
+            if (move.getCapturedPiece() != null) {
+                captures.add(move);
+            } else {
+                quietMoves.add(move);
+            }
+
+        }
+
+
+
+//        sortMovesByCapture(captures);
+        sortMovesByKillers(quietMoves, depth);
+
+        allMoves.clear();
+        allMoves.addAll(captures);
+        allMoves.addAll(quietMoves);
+
+        return allMoves;
     }
 
 
-   private void sortMovesByCapture(List<Move> moves) {
+    private void sortMovesByKillers(List<Move> quietMoves, int depth) {
+        quietMoves.sort((move1, move2) -> {
+            if (searcher.isKillerMove(move1, depth) && !searcher.isKillerMove(move2, depth)) {
+                return -1;
+            } else if (searcher.isKillerMove(move2, depth) && !searcher.isKillerMove(move1, depth)) {
+                return 1;
+            } else {
+                return 0;
+            }
+        });
+    }
+
+
+    private void sortMovesByCapture(List<Move> moves) {
         moves.sort((move1, move2) -> {
             if (move1.getCapturedPiece() != null && move2.getCapturedPiece() == null) {
                 return -1; // move1 first
@@ -134,7 +167,7 @@ public class Board {
             }
         });
 
-   }
+    }
 
 
     private void removeIllegalMoves(List<Move> moves) {
@@ -143,6 +176,7 @@ public class Board {
             boolean isWhitesMove = move.getMovedPiece().getIsWhite();
             King king = getKing(isWhitesMove);
             this.makeMove(move);
+            System.out.println("move: " + move);
 
             if (isKingInCheck(king)){
                 movesToRemove.add(move);
@@ -197,6 +231,10 @@ public class Board {
 
         this.moveHistory.push(move);
         this.lastMove = move;
+
+        System.out.println(this.toString());
+
+
         updateCastlingRights(move);
         setIsWhitesTurn(!getIsWhitesTurn());
     }
@@ -407,6 +445,33 @@ public class Board {
 
     public void setEnPassantField(String enPassantField) {
         this.enPassantField = enPassantField;
+    }
+
+    public void setSearcher(Searcher searcher) {
+        this.searcher = searcher;
+    }
+
+    @Override
+    public String toString() {
+        StringBuilder sb = new StringBuilder();
+        for (int row = 0; row < CHESSBOARD_ROWS; row++) {
+            for (int col = 0; col < CHESSBOARD_COLUMNS; col++) {
+                Piece piece = boardState[7 - row][col];
+                if (piece == null) {
+                    sb.append(". "); // Use "." to represent empty squares
+                } else {
+                    char pieceChar = piece.getType() == PieceType.KNIGHT ? 'N' : piece.getType().toString().charAt(0);
+
+                    if (piece.getIsWhite()) {
+                        sb.append(Character.toUpperCase(pieceChar)).append(" ");
+                    } else {
+                        sb.append(Character.toLowerCase(pieceChar)).append(" ");
+                    }
+                }
+            }
+            sb.append("\n"); // Add a newline after each row
+        }
+        return sb.toString();
     }
 }
 
