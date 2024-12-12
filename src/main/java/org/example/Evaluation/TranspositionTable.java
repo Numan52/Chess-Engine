@@ -32,4 +32,8 @@ public class TranspositionTable {
             this.bestMove = bestMove;
         }
     }
+
+    public Map<Long, TranspositionEntry> getTable() {
+        return table;
+    }
 }

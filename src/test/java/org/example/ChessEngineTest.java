@@ -214,6 +214,69 @@ public class ChessEngineTest {
     }
 
 
+    @Test
+    public void testMate() {
+        chessEngine.updateBoard("N7/5kpp/b3r3/5p2/PB1P4/8/2P2P1P/RR4K1 b - - 0 24");
+
+        MoveScore moveScore = chessEngine.calculateBestMove();
+
+        System.out.println(moveScore.movePath);
+
+    }
+
+
+    @Test
+    public void testIdenticalPositionsProduceSameHash() {
+        chessEngine.updateBoard("r7/2N2kpp/b3r3/5p2/PB1P4/8/2P2P1P/RR4K1 w - - 1 24");
+        long hash1 = board.getPositionHash();
+
+        chessEngine.updateBoard("r7/2N2kpp/b3r3/5p2/PB1P4/8/2P2P1P/RR4K1 w - - 1 24");
+        long hash2 = board.getPositionHash();
+
+        Assert.assertEquals(hash1, hash2);
+    }
+
+
+    @Test
+    public void testDifferentlPositionsProduceDifferentHash() {
+        chessEngine.updateBoard("r7/2N2kpp/b3r3/5p2/PB1P4/8/2P2P1P/RR4K1 w - - 1 24");
+        long hash1 = board.getPositionHash();
+
+        chessEngine.updateBoard("r7/2N2kpp/b3r3/5p2/PB1P4/8/2P2P1P/RR4K1 b - - 1 24");
+        long hash2 = board.getPositionHash();
+
+        Assert.assertNotEquals(hash1, hash2);
+    }
+
+
+    @Test
+    public void testPositionHashIsCorrectlyUpdated() {
+        chessEngine.updateBoard("r7/2N2kpp/b3r3/5p2/PB1P4/8/2P2P1P/RR4K1 w - - 1 24");
+        long originalHash = board.getPositionHash();
+
+        Piece movedPiece = board.getBoardState()[6][2];
+        Piece capturedPiece = board.getBoardState()[7][0];
+        Move move1 = new Move(6, 2, 7, 0, movedPiece, capturedPiece, false, false, null);
+        board.makeMove(move1);
+        long hash2 = board.getPositionHash();
+
+        Piece movedPiece2 = board.getBoardState()[5][4];
+
+        Move move2 = new Move(5, 4, 5, 6, movedPiece2, null, false, false, null);
+        board.makeMove(move2);
+        long hash3 = board.getPositionHash();
+
+        Assert.assertNotEquals(hash2, hash3);
+
+        board.undoMove(move2);
+        board.undoMove(move1);
+
+
+
+        Assert.assertEquals(originalHash, board.getPositionHash());
+    }
+
+
 
 }
 

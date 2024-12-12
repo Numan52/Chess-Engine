@@ -20,6 +20,9 @@ public class BoardParser {
 
     public static Piece[][] fenToBoardState(Board board, String fen) {
         String[] fenPieces = fen.split(" ");
+        if (fenPieces.length != 6) {
+            throw new IllegalArgumentException("incorrect fen format");
+        }
         String[] rows = fenPieces[0].split("/");
         Piece[][] boardState = new Piece[8][8];
         System.out.println(Arrays.toString(rows));

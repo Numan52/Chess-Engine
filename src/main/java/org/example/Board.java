@@ -63,9 +63,7 @@ public class Board {
 
         }
 
-
-
-//        sortMovesByCapture(captures);
+        sortCaptures(captures);
         sortMovesByKillers(quietMoves, depth);
 
         allMoves.clear();
@@ -88,16 +86,14 @@ public class Board {
         });
     }
 
-
-    private void sortMovesByCapture(List<Move> moves) {
+    // MVV-LVA
+    private void sortCaptures(List<Move> moves) {
         moves.sort((move1, move2) -> {
-            if (move1.getCapturedPiece() != null && move2.getCapturedPiece() == null) {
-                return -1; // move1 first
-            } else if (move1.getCapturedPiece() == null && move2.getCapturedPiece() != null) {
-                return 1; // move2 second
-            } else {
-                return 0;
-            }
+            int moveOneValueDiff = move1.getCapturedPiece().getValue() - move1.getMovedPiece().getValue();
+            int moveTwoValueDiff = move2.getCapturedPiece().getValue() - move2.getMovedPiece().getValue();
+
+            // move2 second
+            return Integer.compare(moveTwoValueDiff, moveOneValueDiff); // move1 first
         });
 
     }

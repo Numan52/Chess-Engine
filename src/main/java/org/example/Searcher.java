@@ -182,4 +182,9 @@ public class Searcher {
     public Move[][] getKillerMoves() {
         return killerMoves;
     }
+
+
+    public TranspositionTable getTranspositionTable() {
+        return transpositionTable;
+    }
 }
