@@ -2,6 +2,7 @@ package org.example;
 
 import org.example.Piece.*;
 import org.example.Utils.BoardParser;
+import org.example.Utils.ChessUtils;
 
 import java.util.*;
 
@@ -9,7 +10,9 @@ public class Board {
 
     public static final int CHESSBOARD_ROWS = 8;
     public static final int CHESSBOARD_COLUMNS = 8;
+
     private boolean isGameOver;
+    private boolean isCheckmate;
     private Stack<Move> moveHistory = new Stack<>();
     private Piece[][] boardState = new Piece[8][8];
     private boolean isWhitesTurn;
@@ -17,92 +20,22 @@ public class Board {
     private String enPassantField;
     private int castlingRights; // 4 bits - qkQK
     private Searcher searcher;
+    private King whiteKing;
+    private King blackKing;
+    private ZobristHash zobristHash;
+    private long positionHash;
 
-    public Board() {
-        createChessboard();
+
+    public Board(ZobristHash zobristHash) {
         this.lastMove = null;
         this.isGameOver = false;
         this.isWhitesTurn = true;
-
+        this.isCheckmate = false;
+        this.whiteKing = null;
+        this.blackKing = null;
+        this.positionHash = 0;
+        this.zobristHash = zobristHash;
     }
-
-
-    public void createChessboard() {
-        for(int row = 0; row < CHESSBOARD_ROWS; row++) {
-            for (int col = 0; col < CHESSBOARD_COLUMNS; col++) {
-                Piece piece = createPiece(row, col);
-                if (piece != null) {
-                    boardState[row][col] = piece;
-                }
-            }
-        }
-
-    }
-
-
-    public void removePieceFromBoard(int row, int col) {
-        boardState[row][col] = null;
-    }
-
-
-    public Piece createPiece(int row, int col) {
-        switch (row) {
-            case 0:
-                switch (col) {
-                    case 0, 7 -> {
-                        return new Rook(this, row, col, true);
-                    }
-                    case 1, 6 -> {
-                        return new Knight(this, row, col, true);
-                    }
-                    case 2, 5 -> {
-                        return new Bishop(this, row, col, true);
-                    }
-                    case 3 -> {
-                        return new Queen(this, row, col, true);
-                    }
-                    case 4 -> {
-                        return new King(this, row, col, true);
-                    }
-                }
-                break;
-            case 1:
-                switch (col) {
-                    case 0, 1, 2, 3, 4, 5, 6, 7 -> {
-                        return new Pawn(this, row, col, true);
-                    }
-                }
-                break;
-            case 6:
-                switch (col) {
-                    case 0, 1, 2, 3, 4, 5, 6, 7 -> {
-                        return new Pawn(this, row, col, false);
-                    }
-                }
-                break;
-            case 7:
-                switch (col) {
-                    case 0, 7 -> {
-                        return new Rook(this, row, col, false);
-                    }
-                    case 1, 6 -> {
-                        return new Knight(this, row, col, false);
-                    }
-                    case 2, 5 -> {
-                        return new Bishop(this, row, col, false);
-                    }
-                    case 3 -> {
-                        return new Queen(this, row, col, false);
-                    }
-                    case 4 -> {
-                        return new King(this, row, col, false);
-                    }
-                }
-                break;
-        }
-        return null;
-    }
-
 
     // TODO: HANDLE MOVES THAT LEAD TO CHECKMATE
 
@@ -176,7 +109,7 @@ public class Board {
             boolean isWhitesMove = move.getMovedPiece().getIsWhite();
             King king = getKing(isWhitesMove);
             this.makeMove(move);
-            System.out.println("move: " + move);
+//            System.out.println("move: " + move);
 
             if (isKingInCheck(king)){
                 movesToRemove.add(move);
@@ -232,15 +165,26 @@ public class Board {
         this.moveHistory.push(move);
         this.lastMove = move;
 
-        System.out.println(this.toString());
+//        System.out.println(this.toString());
 
 
         updateCastlingRights(move);
         setIsWhitesTurn(!getIsWhitesTurn());
+
+        positionHash = zobristHash.updatePositionHash(positionHash, move);
+
+//        if (isCheckmate()) {
+//            this.isCheckmate = true;
+//            this.isGameOver = true;
+//        }
     }
 
 
     public void undoMove(Move move) {
+        if (isCheckmate) {
+            isCheckmate = false;
+        }
+
         this.boardState[move.getStartRow()][move.getStartCol()] = move.getMovedPiece();
         this.boardState[move.getTargetRow()][move.getTargetCol()] = move.getCapturedPiece();
 
@@ -287,8 +231,15 @@ public class Board {
             this.lastMove = null;
         }
 
+//        if (isCheckmate) {
+//            isCheckmate = false;
+//            isGameOver = false;
+//        }
+
         castlingRights = move.getPreviousCastlingRights();
         setIsWhitesTurn(!getIsWhitesTurn());
+
+        positionHash = zobristHash.updatePositionHash(positionHash, move);
     }
 
 
@@ -298,7 +249,7 @@ public class Board {
 
         if (move.getMovedPiece().getType() == PieceType.KING) {
             if (move.getMovedPiece().getIsWhite()) {
-                this.castlingRights &= ~0b0011; // bitwise AND Operation
+                this.castlingRights &= ~0b0011; //  NAND Operation
             } else {
                 this.castlingRights &= ~0b1100;
             }
@@ -348,6 +299,7 @@ public class Board {
 
 
     public boolean isKingInCheck(Piece king) {
+
         for (Piece[] pieceRow : this.boardState) {
             for (Piece piece : pieceRow) {
                 if (piece != null && piece.getIsWhite() != king.getIsWhite()) {
@@ -360,8 +312,43 @@ public class Board {
         return false;
     }
 
+    // TODO: OPTIMIZE
+    public boolean isCheckmate() {
+        King king = getKing(isWhitesTurn);
 
+        if (!isKingInCheck(king)) {
+            return false;
+        }
+
+        List<Move> kingMoves = king.generatePossibleMoves();
+        for (Move move : kingMoves) {
+            this.makeMove(move);
+            if (!isKingInCheck(king)) {
+                return false;
+            }
+            this.undoMove(move);
+        }
+
+        List<Move> allMoves = this.getAllPossibleMoves(0);
+        for (Move move : allMoves) {
+            this.makeMove(move);
+            if (!isKingInCheck(king)) {
+                return false;
+            }
+            this.undoMove(move);
+        }
+
+
+        return true;
+    }
+
+    // TODO: CHECK IF THIS WORKS
     public King getKing(boolean isWhite) {
+        King king = isWhite ? this.whiteKing : this.blackKing;
+        if (king != null) {
+            return king;
+        }
+
         for (Piece[] pieceRow : getBoardState()) {
             for (Piece piece : pieceRow) {
                 if (piece != null) {
@@ -403,10 +390,60 @@ public class Board {
     }
 
 
+    public int getEnPassantFile() {
+        int col = -1;
+        Move lastMove = getLastMove();
+
+        if (lastMove == null) {
+            col = ChessUtils.enPassantFieldToCol(this);
+            return col;
+        }
+
+        if (lastMove.getMovedPiece().getType() != PieceType.PAWN) {
+            return -1;
+        }
+
+        int startRow = lastMove.getStartRow();
+        int endRow = lastMove.getTargetRow();
+
+        boolean isTwoSquareMove = Math.abs(endRow - startRow) == 2;
+        if (!isTwoSquareMove) {
+            return -1;
+        }
+
+        return lastMove.getTargetCol();
+
+    }
+
+
+
+    public King getWhiteKing() {
+        return whiteKing;
+    }
+
+    public void setWhiteKing(King whiteKing) {
+        this.whiteKing = whiteKing;
+    }
+
+    public King getBlackKing() {
+        return blackKing;
+    }
+
+    public void setBlackKing(King blackKing) {
+        this.blackKing = blackKing;
+    }
+
     public Piece[][] getBoardState() {
         return boardState;
     }
 
+    public boolean getIsCheckmate() {
+        return isCheckmate;
+    }
+
+    public void setIsCheckmate(boolean isCheckmate) {
+        this.isCheckmate = isCheckmate;
+    }
 
     public boolean isGameOver() {
         return isGameOver;
@@ -451,6 +488,14 @@ public class Board {
         this.searcher = searcher;
     }
 
+    public long getPositionHash() {
+        return positionHash;
+    }
+
+    public void setPositionHash(long positionHash) {
+        this.positionHash = positionHash;
+    }
+
     @Override
     public String toString() {
         StringBuilder sb = new StringBuilder();
@@ -473,5 +518,7 @@ public class Board {
         }
         return sb.toString();
     }
+
+
 }
 

@@ -8,6 +8,7 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import org.example.*;
 import org.example.Evaluation.PositionEvaluater;
+import org.example.Evaluation.TranspositionTable;
 import org.json.JSONException;
 import org.json.JSONObject;
 
@@ -16,10 +17,12 @@ import java.io.IOException;
 import java.util.List;
 
 public class EngineServlet extends HttpServlet {
-    private Board board = new Board();
+    private ZobristHash zobristHash = new ZobristHash();
+    private TranspositionTable transpositionTable = new TranspositionTable();
+    private Board board = new Board(zobristHash);
     private PositionEvaluater positionEvaluater = new PositionEvaluater(board);
-    private Searcher searcher = new Searcher(board, 4, 15, positionEvaluater);
-    private ChessEngine chessEngine = new ChessEngine(board, searcher, positionEvaluater);
+    private Searcher searcher = new Searcher(board, 4, 15, positionEvaluater, transpositionTable);
+    private ChessEngine chessEngine = new ChessEngine(board, searcher, positionEvaluater, zobristHash);
 
 
     // fen should have the following form: rnb1kbnr/ppp2ppp/8/3Np1q1/8/5N2/PPPPPPPP/R1BQKB1R w KQkq e6 1 4

@@ -8,24 +8,27 @@ import java.util.Map;
 public class TranspositionTable {
     private Map<Long, TranspositionEntry> table = new HashMap<>();
 
-    public void store(long key, int depth, int score, int flag, Move bestMove) {
-        table.put(key, new TranspositionEntry(depth, score, flag, bestMove));
+    public void store(long zobristKey, int depth, int score, boolean replaceFlag, int evalType, Move bestMove) {
+        table.put(zobristKey, new TranspositionEntry(depth, score, replaceFlag, evalType, bestMove));
     }
 
-    public TranspositionEntry lookup(long key) {
-        return table.get(key);
+    public TranspositionEntry lookup(long zobristKey) {
+        return table.get(zobristKey);
     }
 
     public static class TranspositionEntry {
         public int depth;
         public int score;
-        public int flag; // 0 = exact, -1 = lower bound, 1 = upper bound
+        // TODO: SET FLAG TO INDICATE IF ENTRY SHOULD BE REPLACED (if its useless)
+        public boolean replaceFlag = false;
+        public int evalType; // 0 = exact, -1 = lower bound, 1 = upper bound
         public Move bestMove;
 
-        public TranspositionEntry(int depth, int score, int flag, Move bestMove) {
+        public TranspositionEntry(int depth, int score, boolean replaceFlag, int evalType, Move bestMove) {
             this.depth = depth;
             this.score = score;
-            this.flag = flag;
+            this.replaceFlag = replaceFlag;
+            this.evalType = evalType;
             this.bestMove = bestMove;
         }
     }

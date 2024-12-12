@@ -10,11 +10,13 @@ public class ChessEngine {
     private Board board;
     private Searcher searcher;
     private PositionEvaluater positionEvaluater;
+    private ZobristHash zobristHash;
 
-    public ChessEngine(Board board, Searcher searcher, PositionEvaluater positionEvaluater) {
+    public ChessEngine(Board board, Searcher searcher, PositionEvaluater positionEvaluater, ZobristHash zobristHash) {
         this.board = board;
         this.searcher = searcher;
         this.positionEvaluater = positionEvaluater;
+        this.zobristHash = zobristHash;
     }
 
 
@@ -26,9 +28,9 @@ public class ChessEngine {
         board.setBoardState(boardState);
         board.setIsWhitesTurn(isWhitesTurn);
         board.setEnPassantField(enPassantField);
-
-
         updateCastlingRights(fen);
+
+        board.setPositionHash(zobristHash.calculatePositionHash(board));
 
     }
 

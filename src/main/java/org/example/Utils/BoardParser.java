@@ -35,6 +35,13 @@ public class BoardParser {
                 char color = Character.isUpperCase(rows[i].charAt(j)) ? 'w' : 'b';
                 char type = Character.toUpperCase(rows[i].charAt(j));
                 Piece piece = createPiece(board, 7 - i, col, color, type);
+                if (piece.getType() == PieceType.KING) {
+                    if (piece.getIsWhite()) {
+                        board.setWhiteKing((King) piece);
+                    } else {
+                        board.setBlackKing((King) piece);
+                    }
+                }
                 boardState[7 - i][col] = piece;
                 col++;
             }

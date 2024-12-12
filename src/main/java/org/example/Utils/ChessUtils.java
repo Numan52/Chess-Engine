@@ -11,4 +11,11 @@ public class ChessUtils {
     }
 
 
+    public static int enPassantFieldToCol(Board board) {
+        if (board.getEnPassantField().equals("-")) {
+            return -1;
+        }
+        return board.getEnPassantField().charAt(0) - (int) 'a';
+    }
+
 }

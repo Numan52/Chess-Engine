@@ -59,25 +59,7 @@ public class Pawn extends Piece {
         return false;
     }
 
-    @Override
-    public int[][] getPieceSquareTable() {
-        return new int[][] {
-                {0, 0, 0, 0, 0, 0, 0, 0},
-                {50, 50, 50, 50, 50, 50, 50, 50},
-                {10, 10, 20, 30, 30, 20, 10, 10},
-                {5, 5, 10, 25, 25, 10, 5, 5},
-                {0, 0, 0, 20, 20, 0, 0, 0},
-                {5, -5, -10, 0, 0, -10, -5, 5},
-                {5, 10, 10, -20, -20, 10, 10, 5},
-                {0, 0, 0, 0, 0, 0, 0, 0}
-        };
 
-    }
-
-    @Override
-    public int[][] getPieceSquareTable(boolean isEndgame) {
-        return getPieceSquareTable();
-    }
 
 
     @Override
@@ -156,45 +138,64 @@ public class Pawn extends Piece {
         }
     }
 
+    //TODO: meine augen tun weh
     // enPassantField is the field that the pawn will land in if after performing en passant (eg. f3)
     public List<Move> generateEnPassantMove() {
         List<Move> possibleEnPassantMoves = new ArrayList<>();
 
-        // no en passant possible
-        if (this.getChessboard().getEnPassantField().equals("-")) {
+
+
+        if (this.getChessboard().getLastMove() == null) {
+            if (this.getChessboard().getEnPassantField().equals("-")) {
+                return List.of();
+            } else {
+                int enPassantRow = calculateEnPassantRow();
+                int enPassantCol = calculateEnPassantCol();
+                int direction = this.getIsWhite() ? -1 : 1;
+                int opponentPawnRow = enPassantRow + direction;
+
+
+                if (this.getRow() == opponentPawnRow &&
+                        (this.getCol() == enPassantCol - 1 || this.getCol() == enPassantCol + 1)) {
+                    Piece capturedPiece = this.getChessboard().getBoardState()[this.getRow()][enPassantCol];
+                    possibleEnPassantMoves.add(new Move(
+                                    this.getRow(), this.getCol(), enPassantRow, enPassantCol, this, capturedPiece,
+                                    false, true, null
+                            )
+                    );
+                }
+                return possibleEnPassantMoves;
+            }
+        }
+
+        if (this.getChessboard().getLastMove().getMovedPiece().getType() != PieceType.PAWN) {
             return List.of();
         }
 
-        int enPassantRow = calculateEnPassantRow();
-        int enPassantCol = calculateEnPassantCol();
-        int direction = this.getIsWhite() ? -1 : 1;
-        int opponentPawnRow = enPassantRow + direction;
+        int startRow = this.getChessboard().getLastMove().getStartRow();
+        int endRow = this.getChessboard().getLastMove().getTargetRow();
+        int col  = this.getChessboard().getLastMove().getTargetCol();
+        int direction = this.getIsWhite() ? 1 : -1;
 
-        if (this.getRow() == opponentPawnRow &&
-                (this.getCol() == enPassantCol - 1 || this.getCol() == enPassantCol + 1)) {
+        boolean isTwoSquareMove = Math.abs(endRow - startRow) == 2;
+        if (!isTwoSquareMove) {
+            return List.of();
+        }
 
-            System.out.println("en passant: " + this);
-            Piece capturedPiece = this.getChessboard().getBoardState()[this.getRow()][enPassantCol];
+        if (this.getRow() == endRow &&
+                (this.getCol() == col - 1 || this.getCol() == col + 1)) {
+            Piece capturedPiece = this.getChessboard().getBoardState()[this.getRow()][col];
             possibleEnPassantMoves.add(new Move(
-                            this.getRow(), this.getCol(), enPassantRow, enPassantCol, this, capturedPiece,
+                            this.getRow(), this.getCol(), this.getRow() + direction, col, this, capturedPiece,
                             false, true, null
-                            )
+                    )
             );
         }
 
         return possibleEnPassantMoves;
     }
 
-    public static final int[][] PAWN_TABLE = {
-            {0, 0, 0, 0, 0, 0, 0, 0},
-            {50, 50, 50, 50, 50, 50, 50, 50},
-            {10, 10, 20, 30, 30, 20, 10, 10},
-            {5, 5, 10, 25, 25, 10, 5, 5},
-            {0, 0, 0, 20, 20, 0, 0, 0},
-            {5, -5, -10, 0, 0, -10, -5, 5},
-            {5, 10, 10, -20, -20, 10, 10, 5},
-            {0, 0, 0, 0, 0, 0, 0, 0}
-    };
+
 
 
     private int calculateEnPassantRow() {
@@ -209,6 +210,27 @@ public class Pawn extends Piece {
 
     private boolean isPromotionRow(int row) {
         return (row == 7 && getIsWhite()) || (row == 0 && !getIsWhite());
+    }
+
+
+    @Override
+    public int[][] getPieceSquareTable() {
+        return new int[][] {
+                {0, 0, 0, 0, 0, 0, 0, 0},
+                {50, 50, 50, 50, 50, 50, 50, 50},
+                {10, 10, 20, 30, 30, 20, 10, 10},
+                {5, 5, 10, 25, 25, 10, 5, 5},
+                {0, 0, 0, 20, 20, 0, 0, 0},
+                {5, -5, -10, 0, 0, -10, -5, 5},
+                {5, 10, 10, -20, -20, 10, 10, 5},
+                {0, 0, 0, 0, 0, 0, 0, 0}
+        };
+
+    }
+
+    @Override
+    public int[][] getPieceSquareTable(boolean isEndgame) {
+        return getPieceSquareTable();
     }
 
 

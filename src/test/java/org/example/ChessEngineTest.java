@@ -1,6 +1,7 @@
 package org.example;
 
 import org.example.Evaluation.PositionEvaluater;
+import org.example.Evaluation.TranspositionTable;
 import org.example.Piece.Pawn;
 import org.example.Piece.Piece;
 import org.example.Piece.PieceType;
@@ -19,14 +20,17 @@ public class ChessEngineTest {
     private PositionEvaluater positionEvaluater;
     private Searcher searcher;
     private ChessEngine chessEngine;
-
+    private ZobristHash zobristHash;
+    private TranspositionTable transpositionTable;
 
     @Before
     public void setUp() {
-        board = new Board();
+        zobristHash = new ZobristHash();
+        transpositionTable = new TranspositionTable();
+        board = new Board(zobristHash);
         positionEvaluater = new PositionEvaluater(board);
-        searcher = new Searcher(board, 7, 30000, positionEvaluater);
-        chessEngine = new ChessEngine(board, searcher, positionEvaluater);
+        searcher = new Searcher(board, 8, 40000, positionEvaluater, transpositionTable);
+        chessEngine = new ChessEngine(board, searcher, positionEvaluater, zobristHash);
     }
 
 
@@ -105,6 +109,7 @@ public class ChessEngineTest {
     public void testUpdateBoardCorrectlySetsBoardState() {
         chessEngine.updateBoard("rnbqkbnr/pppp1Bp1/7p/4p3/4P3/8/PPPP1PPP/RNBQK1NR b KQkq - 0 3");
         List<Move> possibleMoves = board.getAllPossibleMoves(0);
+        System.out.println(board.toString());
         Assert.assertEquals(2, possibleMoves.size());
     }
 
@@ -168,6 +173,7 @@ public class ChessEngineTest {
         System.out.println(move);
     }
 
+    // TODO: WHAT IS WRONG WITH THE BOARD STATE
     @Test
     public void testSearcherCalculatesCorrectCapture2() {
         chessEngine.updateBoard("r2qr1k1/1bp2pp1/p2b1n1p/2pP4/2B1N2B/P7/1PPQ1PPP/3RR1K1 b - - 2 18");
@@ -181,12 +187,26 @@ public class ChessEngineTest {
         Assert.assertEquals(4, move.getTargetCol());
     }
 
+    @Test
+    public void testSearcherCalculatesCorrectCapture3() {
+        chessEngine.updateBoard("rn1qkb1r/ppp2ppp/1n1p4/6Bb/2P5/3P1N1P/PP3PP1/RN1QKB1R b KQkq - 2 8");
+
+        Move move = chessEngine.calculateBestMove().move;
+
+        System.out.println(move);
+        Assert.assertEquals(PieceType.BISHOP, move.getMovedPiece().getType());
+        Assert.assertEquals(PieceType.KNIGHT, move.getCapturedPiece().getType());
+        Assert.assertEquals(2, move.getTargetRow());
+        Assert.assertEquals(5, move.getTargetCol());
+    }
+
+
 
     @Test
     public void testPieceSquareTableAffectsEvaluation() {
         chessEngine.updateBoard("r1b1k2r/ppp2ppp/4pn2/2q1b3/P2n3N/2NP3P/1PPQ1PP1/R1B1KB1R b KQkq - 0 10");
 
-        int evaluation = positionEvaluater.evaluatePosition();
+        int evaluation = positionEvaluater.evaluatePosition(0);
         System.out.println(evaluation);
 
         Assert.assertTrue(evaluation < -0.5);

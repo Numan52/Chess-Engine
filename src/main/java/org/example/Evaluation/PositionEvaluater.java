@@ -12,8 +12,13 @@ public class PositionEvaluater {
         this.board = board;
     }
 
-    public int evaluatePosition() {
+    public int evaluatePosition(int depth) {
+        if (board.getIsCheckmate()) {
+            return evaluateCheckmate(depth);
+        }
+
         int evaluation = 0;
+
         for (Piece[] piecesRow : board.getBoardState()) {
             for (Piece piece : piecesRow) {
                 if (piece != null ) {
@@ -38,5 +43,16 @@ public class PositionEvaluater {
         } else {
             return piece.getPieceSquareTable()[piece.getRow()][piece.getCol()];
         }
+    }
+
+
+    public int evaluateCheckmate(int depth) {
+        // check if side whose turn it is, is checkmated
+        if (board.getIsWhitesTurn()) {
+            return Integer.MIN_VALUE + depth;
+        } else {
+            return Integer.MAX_VALUE - depth;
+        }
+
     }
 }

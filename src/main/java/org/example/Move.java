@@ -3,6 +3,8 @@ package org.example;
 import org.example.Piece.Piece;
 import org.example.Piece.PieceType;
 
+import java.util.Objects;
+
 public class Move {
     private final int startRow;
     private final int startCol;
@@ -87,5 +89,17 @@ public class Move {
                 ", startCol=" + startCol +
                 ", startRow=" + startRow +
                 '}';
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (o == null || getClass() != o.getClass()) return false;
+        Move move = (Move) o;
+        return startRow == move.startRow && startCol == move.startCol && targetRow == move.targetRow && targetCol == move.targetCol && isCastling == move.isCastling && isEnPassant == move.isEnPassant && Objects.equals(movedPiece, move.movedPiece) && Objects.equals(capturedPiece, move.capturedPiece) && promotionPiece == move.promotionPiece;
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(startRow, startCol, targetRow, targetCol, movedPiece, capturedPiece, isCastling, isEnPassant, promotionPiece, previousCastlingRights);
     }
 }

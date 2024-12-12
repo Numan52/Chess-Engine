@@ -1,6 +1,7 @@
 package org.example;
 
 import org.example.Evaluation.PositionEvaluater;
+import org.example.Evaluation.TranspositionTable;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -9,16 +10,19 @@ public class Searcher {
     private Board board;
     private int maxDepth;
     private PositionEvaluater positionEvaluater;
+    private TranspositionTable transpositionTable;
     private int maxSearchTime;
     private boolean isTimeUp;
     private Move[][] killerMoves;
 
 
-    public Searcher(Board board, int maxDepth, int maxSearchTime, PositionEvaluater positionEvaluater) {
+
+    public Searcher(Board board, int maxDepth, int maxSearchTime, PositionEvaluater positionEvaluater, TranspositionTable transpositionTable) {
         this.board = board;
         this.maxDepth = maxDepth;
         this.maxSearchTime = maxSearchTime;
         this.positionEvaluater = positionEvaluater;
+        this.transpositionTable = transpositionTable;
         this.isTimeUp = false;
         this.killerMoves = new Move[maxDepth + 1][2]; // 2 Killer moves per depth
         board.setSearcher(this);
@@ -31,17 +35,46 @@ public class Searcher {
             return new MoveScore(null, 0, new ArrayList<>());
         }
 
-        if (depth == 0 || board.isGameOver()) {
-            return new MoveScore(null, positionEvaluater.evaluatePosition(), new ArrayList<>());
+        // TODO: CHECK FOR DRAW (INSUFFICIENT MATERIAL, STALEMATE, 50-MOVE RULE)
+        // TODO: WHY IS THIS CAUSING STRANGE BUGS LIKE SPAWNING EXTRA KINGS
+//        if (board.isCheckmate()) {
+//            System.out.println("Checkmate");
+//            board.setIsCheckmate(true);
+//        }
+
+        if (depth == 0 || board.getIsCheckmate()) {
+            return new MoveScore(null, positionEvaluater.evaluatePosition(depth), new ArrayList<>());
+        }
+
+        TranspositionTable.TranspositionEntry entry = transpositionTable.lookup(board.getPositionHash());
+        if (entry != null && entry.depth >= depth) {
+            if (entry.evalType == 0) {
+                return new MoveScore(entry.bestMove, entry.score, new ArrayList<>());
+            }
+            if (entry.evalType == 1) {
+                beta = entry.score;
+            }
+            if (entry.evalType == -1) {
+                alpha = entry.score;
+            }
+
+            if (beta <= alpha) {
+                return new MoveScore(entry.bestMove, entry.score, new ArrayList<>());
+            }
         }
 
         Move bestMove = null;
         List<Move> bestPath = new ArrayList<>();
+        int evalType = 0;
 
         if (isWhitesTurn) {
             List<Move> possibleMoves = board.getAllPossibleMoves(depth);
             int maxEval = Integer.MIN_VALUE;
+
             for (Move move : possibleMoves) {
+                if (isTimeUp) {
+                    break;
+                }
                 board.makeMove(move);
                 MoveScore childScore = minimax(board, depth - 1, alpha, beta, false, startTime);
                 board.undoMove(move);
@@ -53,15 +86,17 @@ public class Searcher {
                     bestPath.add(0, move); // Add the current move to the path
                 }
 
+
                 alpha = Math.max(alpha, childScore.score);
                 if (beta <= alpha) {
                     if (move.getCapturedPiece() == null) {
                         addKillerMove(move, depth);
                     }
+                    evalType = -1;
                     break;
                 }
             }
-
+            transpositionTable.store(board.getPositionHash(), depth, maxEval, false, evalType, bestMove);
             return new MoveScore(bestMove, maxEval, bestPath);
 
         } else {
@@ -69,6 +104,9 @@ public class Searcher {
 
             int minEval = Integer.MAX_VALUE;
             for (Move move : possibleMoves) {
+                if (isTimeUp) {
+                    break;
+                }
                 board.makeMove(move);
                 MoveScore childScore = minimax(board, depth - 1, alpha, beta, true, startTime);
                 board.undoMove(move);
@@ -85,11 +123,13 @@ public class Searcher {
                     if (move.getCapturedPiece() == null) {
                         addKillerMove(move, depth);
                     }
+                    evalType = 1;
                     break;
                 }
 
             }
 
+            transpositionTable.store(board.getPositionHash(), depth, minEval, false, evalType, bestMove);
             return new MoveScore(bestMove, minEval, bestPath);
         }
 
