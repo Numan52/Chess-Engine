@@ -163,8 +163,17 @@ public class Board {
 
 //        System.out.println(this.toString());
 
+        move.setPreviousCastlingRights(this.castlingRights);
+        if (getIsWhitesTurn()) {
+            if (whiteKing.getHasKingsideCastlingRights() || whiteKing.getHasQueensideCastlingRights()) {
+                updateCastlingRights(move);
+            }
+        } else {
+            if (blackKing.getHasKingsideCastlingRights() || blackKing.getHasQueensideCastlingRights()) {
+                updateCastlingRights(move);
+            }
+        }
 
-        updateCastlingRights(move);
         setIsWhitesTurn(!getIsWhitesTurn());
 
         positionHash = zobristHash.updatePositionHash(positionHash, move);
@@ -241,7 +250,7 @@ public class Board {
 
     // TODO: NO NEED TO CALL THIS FOR THE SIDE WHO ALREADY LOST CASTLING RIGHTS
     public void updateCastlingRights(Move move) {
-        move.setPreviousCastlingRights(this.castlingRights);
+
 
         if (move.getMovedPiece().getType() == PieceType.KING) {
             if (move.getMovedPiece().getIsWhite()) {
