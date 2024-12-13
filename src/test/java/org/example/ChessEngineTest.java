@@ -164,14 +164,14 @@ public class ChessEngineTest {
     }
 
 
-    @Test
-    public void testSearcherCalculatesCorrectMoveInQuietPosition() {
-        chessEngine.updateBoard("r1bqk2r/ppp1bppp/2np1n2/4p3/2B1P3/2NP1N2/PPP2PPP/R1BQK2R w KQkq - 1 6");
-
-        Move move = chessEngine.calculateBestMove().move;
-
-        System.out.println(move);
-    }
+//    @Test
+//    public void testSearcherCalculatesCorrectMoveInQuietPosition() {
+//        chessEngine.updateBoard("r1bqk2r/ppp1bppp/2np1n2/4p3/2B1P3/2NP1N2/PPP2PPP/R1BQK2R w KQkq - 1 6");
+//
+//        Move move = chessEngine.calculateBestMove().move;
+//
+//        System.out.println(move);
+//    }
 
     // TODO: WHAT IS WRONG WITH THE BOARD STATE
     @Test
@@ -220,9 +220,25 @@ public class ChessEngineTest {
 
         MoveScore moveScore = chessEngine.calculateBestMove();
 
-        System.out.println(moveScore.movePath);
+        Piece movedPiece = moveScore.move.getMovedPiece();
+        Assert.assertEquals(PieceType.ROOK, movedPiece.getType());
+        Assert.assertEquals(6, moveScore.move.getTargetCol());
 
     }
+
+    @Test
+    public void testMateInTwo() {
+        chessEngine.updateBoard("1r3rk1/2q2p1p/6p1/1pp5/3B1bPR/1BPQ3P/1P6/6K1 w - - 0 25");
+
+        MoveScore moveScore = chessEngine.calculateBestMove();
+
+        Piece movedPiece = moveScore.move.getMovedPiece();
+        Assert.assertEquals(PieceType.QUEEN, movedPiece.getType());
+        Assert.assertEquals(5, moveScore.move.getTargetRow());
+        Assert.assertEquals(6, moveScore.move.getTargetCol());
+
+    }
+
 
 
     @Test

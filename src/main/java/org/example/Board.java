@@ -38,7 +38,7 @@ public class Board {
     }
 
     // TODO: HANDLE MOVES THAT LEAD TO CHECKMATE
-
+    // TODO: OPTIMIZE (filtering illegal moves)
     public List<Move> getAllPossibleMoves(int depth) {
         List<Move> allMoves = new ArrayList<>();
         for (Piece[] pieceRow : getBoardState()) {
@@ -64,7 +64,7 @@ public class Board {
         }
 
         sortCaptures(captures);
-        sortMovesByKillers(quietMoves, depth);
+        sortMovesByKillers(quietMoves, depth); // TODO: CHECK IF KILLER HEURISTIC WORKS CORRECTLY
 
         allMoves.clear();
         allMoves.addAll(captures);
@@ -92,8 +92,8 @@ public class Board {
             int moveOneValueDiff = move1.getCapturedPiece().getValue() - move1.getMovedPiece().getValue();
             int moveTwoValueDiff = move2.getCapturedPiece().getValue() - move2.getMovedPiece().getValue();
 
-            // move2 second
-            return Integer.compare(moveTwoValueDiff, moveOneValueDiff); // move1 first
+
+            return Integer.compare(moveTwoValueDiff, moveOneValueDiff);
         });
 
     }
@@ -248,10 +248,8 @@ public class Board {
     }
 
 
-    // TODO: NO NEED TO CALL THIS FOR THE SIDE WHO ALREADY LOST CASTLING RIGHTS
+
     public void updateCastlingRights(Move move) {
-
-
         if (move.getMovedPiece().getType() == PieceType.KING) {
             if (move.getMovedPiece().getIsWhite()) {
                 this.castlingRights &= ~0b0011; //  NAND Operation
@@ -320,27 +318,36 @@ public class Board {
     // TODO: OPTIMIZE
     public boolean isCheckmate() {
         King king = getKing(isWhitesTurn);
-
         if (!isKingInCheck(king)) {
             return false;
         }
+
+        boolean canEscape = false;
 
         List<Move> kingMoves = king.generatePossibleMoves();
         for (Move move : kingMoves) {
             this.makeMove(move);
             if (!isKingInCheck(king)) {
-                return false;
+                canEscape = true;
             }
             this.undoMove(move);
+
+            if (canEscape) {
+                return false;
+            }
         }
 
         List<Move> allMoves = this.getAllPossibleMoves(0);
         for (Move move : allMoves) {
             this.makeMove(move);
             if (!isKingInCheck(king)) {
-                return false;
+                canEscape = true;
             }
             this.undoMove(move);
+
+            if (canEscape) {
+                return false;
+            }
         }
 
 

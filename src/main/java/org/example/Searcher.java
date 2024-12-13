@@ -37,10 +37,11 @@ public class Searcher {
 
         // TODO: CHECK FOR DRAW (INSUFFICIENT MATERIAL, STALEMATE, 50-MOVE RULE)
         // TODO: WHY IS THIS CAUSING STRANGE BUGS LIKE SPAWNING EXTRA KINGS
-//        if (board.isCheckmate()) {
-//            System.out.println("Checkmate");
-//            board.setIsCheckmate(true);
-//        }
+        if (board.isCheckmate()) {
+            System.out.println("Checkmate");
+            board.setIsCheckmate(true);
+
+        }
 
         if (depth == 0 || board.getIsCheckmate()) {
             return new MoveScore(null, positionEvaluater.evaluatePosition(depth), new ArrayList<>());
