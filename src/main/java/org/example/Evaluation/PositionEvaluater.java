@@ -1,15 +1,21 @@
 package org.example.Evaluation;
 
 import org.example.Board;
+import org.example.Piece.King;
 import org.example.Piece.Piece;
 import org.example.Piece.PieceType;
 
+import java.util.ArrayList;
+import java.util.List;
+
 public class PositionEvaluater {
     private Board board;
+    private KingSafetyEvaluater kingSafetyEvaluater;
 
 
-    public PositionEvaluater(Board board) {
+    public PositionEvaluater(Board board, KingSafetyEvaluater kingSafetyEvaluater) {
         this.board = board;
+        this.kingSafetyEvaluater = kingSafetyEvaluater;
     }
 
     public int evaluatePosition(int depth) {
@@ -46,6 +52,17 @@ public class PositionEvaluater {
     }
 
 
+    public int evaluateKingSafety(int evaluation) {
+        King whiteKing = board.getWhiteKing();
+        King blackKing = board.getBlackKing();
+
+
+
+
+    }
+
+
+
     public int evaluateCheckmate(int depth) {
         // check if side whose turn it is, is checkmated
         if (board.getIsWhitesTurn()) {
@@ -55,4 +72,6 @@ public class PositionEvaluater {
         }
 
     }
+
+
 }

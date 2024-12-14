@@ -11,6 +11,7 @@ public class King extends Piece {
     private static final int VALUE = 0;
     private boolean hasKingsideCastlingRight = true;
     private boolean hasQueensideCastlingRight = true;
+    private boolean hasCastled = false;
 
     public King(Board chessboard, int x, int y, boolean isWhite) {
         super(chessboard, x, y, isWhite, PieceType.KING);
@@ -207,6 +208,15 @@ public class King extends Piece {
     @Override
     public int getValue() {
         return VALUE;
+    }
+
+
+    public boolean getHasCastled() {
+        return hasCastled;
+    }
+
+    public void setHasCastled(boolean hasCastled) {
+        this.hasCastled = hasCastled;
     }
 
 

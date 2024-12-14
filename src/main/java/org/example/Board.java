@@ -22,11 +22,12 @@ public class Board {
     private Searcher searcher;
     private King whiteKing;
     private King blackKing;
-    private ZobristHash zobristHash;
+
+    private ZobristHash zobristHasher;
     private long positionHash;
 
 
-    public Board(ZobristHash zobristHash) {
+    public Board(ZobristHash zobristHasher) {
         this.lastMove = null;
         this.isGameOver = false;
         this.isWhitesTurn = true;
@@ -34,11 +35,13 @@ public class Board {
         this.whiteKing = null;
         this.blackKing = null;
         this.positionHash = 0;
-        this.zobristHash = zobristHash;
+        this.zobristHasher = zobristHasher;
+
     }
 
     // TODO: HANDLE MOVES THAT LEAD TO CHECKMATE
     // TODO: OPTIMIZE (filtering illegal moves)
+    // depth parameter is only needed for killer moves
     public List<Move> getAllPossibleMoves(int depth) {
         List<Move> allMoves = new ArrayList<>();
         for (Piece[] pieceRow : getBoardState()) {
@@ -49,7 +52,7 @@ public class Board {
             }
         }
 
-        removeIllegalMoves(allMoves);
+        ChessUtils.removeIllegalMoves(this, allMoves);
 
         List<Move> captures = new ArrayList<>();
         List<Move> quietMoves = new ArrayList<>();
@@ -63,8 +66,8 @@ public class Board {
 
         }
 
-        sortCaptures(captures);
-        sortMovesByKillers(quietMoves, depth); // TODO: CHECK IF KILLER HEURISTIC WORKS CORRECTLY
+        ChessUtils.sortCaptures(captures);
+        ChessUtils.sortMovesByKillers(searcher, quietMoves, depth); // TODO: CHECK IF KILLER HEURISTIC WORKS CORRECTLY
 
         allMoves.clear();
         allMoves.addAll(captures);
@@ -73,49 +76,6 @@ public class Board {
         return allMoves;
     }
 
-
-    private void sortMovesByKillers(List<Move> quietMoves, int depth) {
-        quietMoves.sort((move1, move2) -> {
-            if (searcher.isKillerMove(move1, depth) && !searcher.isKillerMove(move2, depth)) {
-                return -1;
-            } else if (searcher.isKillerMove(move2, depth) && !searcher.isKillerMove(move1, depth)) {
-                return 1;
-            } else {
-                return 0;
-            }
-        });
-    }
-
-    // MVV-LVA
-    private void sortCaptures(List<Move> moves) {
-        moves.sort((move1, move2) -> {
-            int moveOneValueDiff = move1.getCapturedPiece().getValue() - move1.getMovedPiece().getValue();
-            int moveTwoValueDiff = move2.getCapturedPiece().getValue() - move2.getMovedPiece().getValue();
-
-
-            return Integer.compare(moveTwoValueDiff, moveOneValueDiff);
-        });
-
-    }
-
-
-    private void removeIllegalMoves(List<Move> moves) {
-        List<Move> movesToRemove = new ArrayList<>();
-        for (Move move : moves) {
-            boolean isWhitesMove = move.getMovedPiece().getIsWhite();
-            King king = getKing(isWhitesMove);
-            this.makeMove(move);
-//            System.out.println("move: " + move);
-
-            if (isKingInCheck(king)){
-                movesToRemove.add(move);
-            }
-
-            this.undoMove(move);
-        }
-
-        moves.removeAll(movesToRemove);
-    }
 
 
     public void makeMove(Move move) {
@@ -136,6 +96,9 @@ public class Board {
         if (move.isCastling()) {
             int rookStartCol = (move.getTargetCol() == 2) ? 0 : 7;
             int rookEndCol = (move.getTargetCol() == 2) ? 3 : 5;
+
+            King king = (King) move.getMovedPiece();
+            king.setHasCastled(true);
 
             Piece rook = this.boardState[move.getTargetRow()][rookStartCol];
             this.boardState[move.getTargetRow()][rookStartCol] = null;
@@ -176,12 +139,7 @@ public class Board {
 
         setIsWhitesTurn(!getIsWhitesTurn());
 
-        positionHash = zobristHash.updatePositionHash(positionHash, move);
-
-//        if (isCheckmate()) {
-//            this.isCheckmate = true;
-//            this.isGameOver = true;
-//        }
+        positionHash = zobristHasher.updatePositionHash(positionHash, move);
     }
 
 
@@ -207,6 +165,9 @@ public class Board {
         if (move.isCastling()) {
             int rookStartCol = (move.getTargetCol() == 2) ? 0 : 7;
             int rookEndCol = (move.getTargetCol() == 2) ? 3 : 5;
+
+            King king = (King) move.getMovedPiece();
+            king.setHasCastled(false);
 
             Piece rook = this.boardState[move.getTargetRow()][rookEndCol];
 
@@ -236,15 +197,10 @@ public class Board {
             this.lastMove = null;
         }
 
-//        if (isCheckmate) {
-//            isCheckmate = false;
-//            isGameOver = false;
-//        }
-
         castlingRights = move.getPreviousCastlingRights();
         setIsWhitesTurn(!getIsWhitesTurn());
 
-        positionHash = zobristHash.updatePositionHash(positionHash, move);
+        positionHash = zobristHasher.updatePositionHash(positionHash, move);
     }
 
 
@@ -324,6 +280,7 @@ public class Board {
 
         boolean canEscape = false;
 
+        // check if king can escape
         List<Move> kingMoves = king.generatePossibleMoves();
         for (Move move : kingMoves) {
             this.makeMove(move);
@@ -337,8 +294,12 @@ public class Board {
             }
         }
 
+        // check if pieces can block check or capture checking piece
         List<Move> allMoves = this.getAllPossibleMoves(0);
         for (Move move : allMoves) {
+            if (move.getMovedPiece().getType() == PieceType.KING) {
+                break;
+            }
             this.makeMove(move);
             if (!isKingInCheck(king)) {
                 canEscape = true;
@@ -349,7 +310,6 @@ public class Board {
                 return false;
             }
         }
-
 
         return true;
     }
@@ -401,31 +361,6 @@ public class Board {
         return null;
     }
 
-
-    public int getEnPassantFile() {
-        int col = -1;
-        Move lastMove = getLastMove();
-
-        if (lastMove == null) {
-            col = ChessUtils.enPassantFieldToCol(this);
-            return col;
-        }
-
-        if (lastMove.getMovedPiece().getType() != PieceType.PAWN) {
-            return -1;
-        }
-
-        int startRow = lastMove.getStartRow();
-        int endRow = lastMove.getTargetRow();
-
-        boolean isTwoSquareMove = Math.abs(endRow - startRow) == 2;
-        if (!isTwoSquareMove) {
-            return -1;
-        }
-
-        return lastMove.getTargetCol();
-
-    }
 
 
 
@@ -507,6 +442,7 @@ public class Board {
     public void setPositionHash(long positionHash) {
         this.positionHash = positionHash;
     }
+
 
     @Override
     public String toString() {

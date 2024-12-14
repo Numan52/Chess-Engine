@@ -1,6 +1,7 @@
 package org.example;
 
 import org.example.Piece.Piece;
+import org.example.Utils.ChessUtils;
 
 import java.util.Random;
 
@@ -55,7 +56,7 @@ public class ZobristHash {
         hash ^= board.getBlackKing().getHasKingsideCastlingRights() ? getCastlingRightsHash(2) : 0;
         hash ^= board.getBlackKing().getHasQueensideCastlingRights() ? getCastlingRightsHash(3) : 0;
 
-        int enPassantCol = board.getEnPassantFile();
+        int enPassantCol = ChessUtils.getEnPassantFile(board);
         hash ^= enPassantCol == -1 ? 0 : getEnPassantHash(enPassantCol);
 
         hash ^= board.getIsWhitesTurn() ? sideToMoveHash : 0;

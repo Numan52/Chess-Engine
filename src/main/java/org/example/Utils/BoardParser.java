@@ -81,6 +81,7 @@ public class BoardParser {
         return getCastlingRights(fen).contains("q");
     }
 
+
     private static String getCastlingRights(String fen) {
         String[] fenPieces = fen.split(" ");
         return fenPieces.length > 2 ? fenPieces[2] : "";
