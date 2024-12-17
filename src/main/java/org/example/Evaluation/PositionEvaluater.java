@@ -10,12 +10,12 @@ import java.util.List;
 
 public class PositionEvaluater {
     private Board board;
-    private KingSafetyEvaluater kingSafetyEvaluater;
+    private List<PieceEvaluater> pieceEvaluaters;
 
 
-    public PositionEvaluater(Board board, KingSafetyEvaluater kingSafetyEvaluater) {
+    public PositionEvaluater(Board board, List<PieceEvaluater> pieceEvaluaters) {
         this.board = board;
-        this.kingSafetyEvaluater = kingSafetyEvaluater;
+        this.pieceEvaluaters = pieceEvaluaters;
     }
 
     public int evaluatePosition(int depth) {
@@ -40,6 +40,11 @@ public class PositionEvaluater {
                 }
             }
         }
+
+//        for (PieceEvaluater pieceEvaluater : pieceEvaluaters) {
+//            evaluation += pieceEvaluater.evaluate();
+//        }
+
         return evaluation;
     }
 
@@ -52,23 +57,13 @@ public class PositionEvaluater {
     }
 
 
-    public int evaluateKingSafety(int evaluation) {
-        King whiteKing = board.getWhiteKing();
-        King blackKing = board.getBlackKing();
-
-
-
-
-    }
-
-
-
     public int evaluateCheckmate(int depth) {
+        int offset = 1000;
         // check if side whose turn it is, is checkmated
         if (board.getIsWhitesTurn()) {
-            return Integer.MIN_VALUE + depth;
+            return Integer.MIN_VALUE + offset + depth;
         } else {
-            return Integer.MAX_VALUE - depth;
+            return Integer.MAX_VALUE - offset - depth;
         }
 
     }

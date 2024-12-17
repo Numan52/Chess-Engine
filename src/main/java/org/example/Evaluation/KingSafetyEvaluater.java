@@ -6,18 +6,39 @@ import org.example.Piece.Piece;
 import org.example.Piece.PieceType;
 import org.example.Piece.Rook;
 
-public class KingSafetyEvaluater {
+public class KingSafetyEvaluater implements PieceEvaluater{
     private Board board;
 
-
+    // TODO: ENDGAME HANDLING
     public KingSafetyEvaluater(Board board) {
         this.board = board;
     }
 
 
-    public int evaluateKingSafety(King piece) {
+    @Override
+    public int evaluate() {
+        int evaluation = 0;
+        King whiteKing = board.getWhiteKing();
+        King blackKing = board.getBlackKing();
 
+        evaluation -= evaluatePawnShield(whiteKing);
+        evaluation += evaluatePawnShield(blackKing);
+
+        evaluation -= evaluateFileSafety(whiteKing);
+        evaluation += evaluateFileSafety(blackKing);
+
+//        evaluation -= evaluateKingsRow(whiteKing);
+//        evaluation += evaluateKingsRow(blackKing);
+
+        evaluation -= evaluateKingsCol(whiteKing);
+        evaluation += evaluateKingsCol(blackKing);
+
+        evaluation -= evaluateKingCastling(whiteKing);
+        evaluation += evaluateKingCastling(blackKing);
+
+        return evaluation;
     }
+
 
 
     public int evaluatePawnShield(King king) {
@@ -28,12 +49,14 @@ public class KingSafetyEvaluater {
         int pawnShieldRow = king.getIsWhite() ? kingRow + 1 : kingRow - 1;
 
         // check the 3 protecting pawns in front of king
-        for (int col = kingCol - 1; col <= kingCol + 1; col++) {
+        for (int col = Math.max(0, kingCol - 1); col <= Math.min(7, kingCol + 1); col++) {
             Piece piece = board.getBoardState()[pawnShieldRow][col];
             if (piece != null && piece.getType() == PieceType.PAWN && piece.getIsWhite() == king.getIsWhite()) {
-                penalty -= 30;
+                penalty -= 30;  // minus = bonus
             }
         }
+
+        return penalty;
     }
 
 
@@ -43,7 +66,8 @@ public class KingSafetyEvaluater {
         boolean hasOppPawn = false;
         boolean hasFriendlyPawn = false;
 
-        for (int col = kingCol - 1; col <= kingCol + 1; col++) {
+
+        for (int col = Math.max(0, kingCol - 1); col <= Math.min(7, kingCol + 1); col++) {
             for (int row = 0; row < board.getBoardState().length; row++) {
                 Piece piece = board.getBoardState()[row][col];
                 if (piece != null && piece.getType() == PieceType.PAWN ) {
@@ -66,7 +90,7 @@ public class KingSafetyEvaluater {
         }
 
 
-
+        return penalty;
 
     }
 
@@ -96,9 +120,6 @@ public class KingSafetyEvaluater {
             return 0;
         }
 
-        if (kingCol == 3 || kingCol == 4) {
-            penalty += 150;
-        }
 
         if (!king.getHasKingsideCastlingRights() && !king.getHasQueensideCastlingRights() ) {
             if (isKingBlockingRookIn(king)) {
@@ -136,7 +157,7 @@ public class KingSafetyEvaluater {
         }
 
         if (kingCol >= 4) {
-            for (int col = kingCol + 1; col < 7; col++) {
+            for (int col = Math.min(7, kingCol + 1); col < 7; col++) {
                 Piece piece = board.getBoardState()[kingRow][col];
                 if (piece != null && piece.getType() == PieceType.ROOK &&
                         piece.getIsWhite() == king.getIsWhite() && piece.getCol() > kingCol) {
