@@ -64,13 +64,13 @@ public class ChessEngine {
         return moveScore;
     }
 
-    public void applyBestMove() {
-        MoveScore moveScore = calculateBestMove();
-        board.makeMove(moveScore.move);
-
-        System.out.println();
-        System.out.println("Best move: " + moveScore.move + ", " + moveScore.score);
-    }
+//    public void applyBestMove() {
+//        MoveScore moveScore = calculateBestMove();
+//        board.makeMove(moveScore.move);
+//
+//        System.out.println();
+//        System.out.println("Best move: " + moveScore.move + ", " + moveScore.score);
+//    }
 
     public Board getBoard() {
         return board;

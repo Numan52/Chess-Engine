@@ -95,4 +95,12 @@ public class ChessUtils {
     }
 
 
+
+    public static String toAlgebraicNotation(int row, int col) {
+        char colChar = (char) ('a' + col);
+        int rowNum = row + 1;
+        String position = String.valueOf(colChar) + rowNum;
+        return position;
+    }
+
 }

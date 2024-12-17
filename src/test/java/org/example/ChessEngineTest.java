@@ -1,5 +1,7 @@
 package org.example;
 
+import org.example.Evaluation.KingSafetyEvaluater;
+import org.example.Evaluation.PawnEvaluater;
 import org.example.Evaluation.PositionEvaluater;
 import org.example.Evaluation.TranspositionTable;
 import org.example.Piece.Pawn;
@@ -17,6 +19,8 @@ import java.util.List;
 
 public class ChessEngineTest {
     private Board board;
+    private KingSafetyEvaluater kingSafetyEvaluater;
+    private PawnEvaluater pawnEvaluater;
     private PositionEvaluater positionEvaluater;
     private Searcher searcher;
     private ChessEngine chessEngine;
@@ -28,8 +32,10 @@ public class ChessEngineTest {
         zobristHash = new ZobristHash();
         transpositionTable = new TranspositionTable();
         board = new Board(zobristHash);
-        positionEvaluater = new PositionEvaluater(board);
-        searcher = new Searcher(board, 8, 40000, positionEvaluater, transpositionTable);
+        kingSafetyEvaluater = new KingSafetyEvaluater(board);
+        pawnEvaluater = new PawnEvaluater(board);
+        positionEvaluater = new PositionEvaluater(board, List.of(kingSafetyEvaluater, pawnEvaluater));
+        searcher = new Searcher(board, 8, 1000000, positionEvaluater, transpositionTable);
         chessEngine = new ChessEngine(board, searcher, positionEvaluater, zobristHash);
     }
 
@@ -231,7 +237,6 @@ public class ChessEngineTest {
         chessEngine.updateBoard("1r3rk1/2q2p1p/6p1/1pp5/3B1bPR/1BPQ3P/1P6/6K1 w - - 0 25");
 
         MoveScore moveScore = chessEngine.calculateBestMove();
-
         Piece movedPiece = moveScore.move.getMovedPiece();
         Assert.assertEquals(PieceType.QUEEN, movedPiece.getType());
         Assert.assertEquals(5, moveScore.move.getTargetRow());
@@ -291,6 +296,24 @@ public class ChessEngineTest {
 
         Assert.assertEquals(originalHash, board.getPositionHash());
     }
+
+
+    @Test
+    public void testAvoidsMateInOne() {
+        chessEngine.updateBoard("rnbqkbnr/1ppppppp/8/8/p1B1P3/5Q2/PPPP1PPP/RNB1K1NR b KQkq - 1 3");
+
+
+        MoveScore moveScore = chessEngine.calculateBestMove();
+        System.out.println(moveScore.move);
+        System.out.println(moveScore.score);
+        Piece movedPiece = moveScore.move.getMovedPiece();
+
+        Assert.assertEquals(PieceType.QUEEN, movedPiece.getType());
+        Assert.assertEquals(5, moveScore.move.getTargetRow());
+        Assert.assertEquals(6, moveScore.move.getTargetCol());
+
+    }
+
 
 
 
