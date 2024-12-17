@@ -1,0 +1,19 @@
+{
+  "name": "chess-engine",
+  "private": true,
+  "version": "0.0.0",
+  "type": "module",
+  "scripts": {
+    "dev": "vite",
+    "build": "vite build",
+    "preview": "vite preview"
+  },
+  "dependencies": {
+    "@chrisoakman/chessboardjs": "^1.0.0",
+    "chess.js": "^1.0.0-beta.8",
+    "jquery": ">=3.4.1"
+  },
+  "devDependencies": {
+    "vite": "^6.0.1"
+  }
+}
