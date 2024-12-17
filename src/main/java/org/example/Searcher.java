@@ -36,7 +36,7 @@ public class Searcher {
         }
 
         // TODO: CHECK FOR DRAW (INSUFFICIENT MATERIAL, STALEMATE, 50-MOVE RULE)
-        // TODO: WHY IS THIS CAUSING STRANGE BUGS LIKE SPAWNING EXTRA KINGS
+
         if (board.isCheckmate()) {
             System.out.println("Checkmate");
             board.setIsCheckmate(true);
@@ -76,9 +76,12 @@ public class Searcher {
                 if (isTimeUp) {
                     break;
                 }
+                //TODO: WHY CHECK THE OTHER MOVES IF CHECKMATE WAS FOUND
                 board.makeMove(move);
                 MoveScore childScore = minimax(board, depth - 1, alpha, beta, false, startTime);
+                boolean isCheckmate = board.getIsCheckmate();
                 board.undoMove(move);
+
 
                 if (childScore.score > maxEval) {
                     bestMove = move;
@@ -96,6 +99,10 @@ public class Searcher {
                     evalType = -1;
                     break;
                 }
+
+                if (isCheckmate) {
+                    break;
+                }
             }
             transpositionTable.store(board.getPositionHash(), depth, maxEval, false, evalType, bestMove);
             return new MoveScore(bestMove, maxEval, bestPath);
@@ -110,6 +117,7 @@ public class Searcher {
                 }
                 board.makeMove(move);
                 MoveScore childScore = minimax(board, depth - 1, alpha, beta, true, startTime);
+                boolean isCheckmate = board.getIsCheckmate();
                 board.undoMove(move);
 
                 if (childScore.score < minEval) {
@@ -128,6 +136,9 @@ public class Searcher {
                     break;
                 }
 
+                if (isCheckmate) {
+                    break;
+                }
             }
 
             transpositionTable.store(board.getPositionHash(), depth, minEval, false, evalType, bestMove);
