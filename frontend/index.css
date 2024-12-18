@@ -1,0 +1,45 @@
+#board-container {
+    display: flex;
+    justify-content: center;
+    gap: 20px;
+    flex-direction: row;
+    margin-top: 50px;
+}
+
+
+body {
+    font-size: 1.4rem;
+}
+
+
+#info-container {
+    display: flex;
+    flex-direction: column;
+    gap: 40px;
+    border: 1px solid rgba(0, 0, 0, 0.247);
+    padding: 10px;
+    background-color: rgba(0, 0, 0, 0.089);
+    color: black;
+    border-radius: 5px;
+    box-shadow: 0px 0px 2px 2px #07070734;
+    width: 300px;
+    white-space: wrap;
+}
+
+
+#misc-container {
+    word-wrap: break-word;
+}
+
+
+#loading-container {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    gap: 40px;
+}
+
+
+.hidden {
+    display: none !important;
+}

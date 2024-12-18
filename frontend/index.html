@@ -16,17 +16,35 @@
   href="https://unpkg.com/@chrisoakman/chessboardjs@1.0.0/dist/chessboard-1.0.0.min.css"
   integrity="sha384-q94+BZtLrkL1/ohfjR8c6L+A6qzNH9R2hBLwyoAfu3i/WCvQjzL2RQJ3uNHDISdU"
   crossorigin="anonymous">
-  
+
+  <link rel="stylesheet" href="index.css">
+  <link rel="stylesheet" href="node_modules/three-dots/dist/three-dots.min.css">
+
   <title>Play Against Engine</title>
 </head>
 <body>
-  <div id="board" style="width: 400px"></div>
-  <label>Status:</label>
-  <div id="status"></div>
-  <label>FEN:</label>
-  <div id="fen"></div>
-  <label>PGN:</label>
-  <div id="pgn"></div>
+  <div id="board-container">
+    <div id="board" style="width: 700px"></div>
+    <div id="info-container">
+      <div id="status-container">
+        <label>Status:</label>
+        <div id="status"></div>
+        <div id="loading-container" class="hidden">
+          <div id="loading-msg">Calculating move</div>
+          <div class="dot-pulse"></div>
+        </div>
+        
+      </div>
+      
+      <div id="misc-container">
+        <label>FEN:</label>
+        <div id="fen"></div>
+      </div>
+      
+    </div>
+    
+  </div>
+  
 
   <script>
     

@@ -1,6 +1,6 @@
 export default async function getComputerMove(fenString) {
     try {
-        const response = await fetch("http://localhost:8080/ChessEngine_war_exploded/engine", {
+        const response = await fetch(`${import.meta.env.VITE_API_URL}/engine`, {
             method: "POST",
             body: JSON.stringify({"fen": fenString})
         })

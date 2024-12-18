@@ -3,6 +3,7 @@ import getComputerMove from "./request.js"
 
 let board = null
 let game = new Chess
+const player = "w"
 let $status = $('#status')
 let $fen = $('#fen')
 let $pgn = $('#pgn')
@@ -13,14 +14,16 @@ function onDragStart (source, piece, position, orientation) {
 
   // only pick up pieces for the side to move
   if ((game.turn() === 'w' && piece.search(/^b/) !== -1) ||
-      (game.turn() === 'b' && piece.search(/^w/) !== -1)) {
+      (game.turn() === 'b' && piece.search(/^w/) !== -1) ||
+      (game.turn() !== player)) {
     return false
   }
+
 }
 
 async function onDrop (source, target) {
   // see if the move is legal
-  console.log("dropoped")
+  
   try {
     let move = game.move({
       from: source,
@@ -32,8 +35,10 @@ async function onDrop (source, target) {
     return 'snapback'
   }
   updateStatus()
-  board.position(game.fen())
+  // board.position(game.fen())
 
+
+  displayLoadingMsg()
   // computer move
   const moveData = await getComputerMove(game.fen())
   console.log(moveData)
@@ -44,9 +49,23 @@ async function onDrop (source, target) {
     promotion: 'q'
   })
 
+  removeLoadingMsg()
   updateStatus()
   board.position(game.fen())
 }
+
+
+function displayLoadingMsg() {
+  const loadingContainer = document.getElementById("loading-container")
+  loadingContainer.classList.remove("hidden")
+}
+
+
+function removeLoadingMsg() {
+  const loadingContainer = document.getElementById("loading-container")
+  loadingContainer.classList.add("hidden")
+}
+
 
 // update the board position after the piece snap
 // for castling, en passant, pawn promotion
@@ -94,11 +113,11 @@ var config = {
   position: "start",
   onDragStart: onDragStart,
   onDrop: onDrop,
-  // onSnapEnd: onSnapEnd
+  onSnapEnd: onSnapEnd
 }
 
 
-
+console.log("hello")
 board = Chessboard('board', config)
 
 console.log(JSON.stringify({ fen: "dasdadad asdad asdada"}))

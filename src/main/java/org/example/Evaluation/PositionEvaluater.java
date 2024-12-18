@@ -41,9 +41,9 @@ public class PositionEvaluater {
             }
         }
 
-//        for (PieceEvaluater pieceEvaluater : pieceEvaluaters) {
-//            evaluation += pieceEvaluater.evaluate();
-//        }
+        for (PieceEvaluater pieceEvaluater : pieceEvaluaters) {
+            evaluation += pieceEvaluater.evaluate();
+        }
 
         return evaluation;
     }
