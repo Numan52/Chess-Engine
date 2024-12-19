@@ -73,7 +73,6 @@ public class EngineServlet extends HttpServlet {
 
         System.out.println(board.toString());
 
-
         JSONObject jsonResponse = new JSONObject();
         jsonResponse.put("from", ChessUtils.toAlgebraicNotation(bestMove.move.getStartRow(), bestMove.move.getStartCol()));
         jsonResponse.put("to", ChessUtils.toAlgebraicNotation(bestMove.move.getTargetRow(), bestMove.move.getTargetCol()));

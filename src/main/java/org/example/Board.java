@@ -142,14 +142,19 @@ public class Board {
         positionHash = zobristHasher.updatePositionHash(positionHash, move);
     }
 
-
+    // TODO: EN PASSANT, CASTLING OR PROMOTION CAUSES INCONSISTENCIES IN BOARD STATE
     public void undoMove(Move move) {
         if (isCheckmate) {
             isCheckmate = false;
         }
 
         this.boardState[move.getStartRow()][move.getStartCol()] = move.getMovedPiece();
-        this.boardState[move.getTargetRow()][move.getTargetCol()] = move.getCapturedPiece();
+        if (!move.isEnPassant()) {
+            this.boardState[move.getTargetRow()][move.getTargetCol()] = move.getCapturedPiece();
+        } else {
+            this.boardState[move.getTargetRow()][move.getTargetCol()] = null;
+        }
+
 
         move.getMovedPiece().setRow(move.getStartRow());
         move.getMovedPiece().setCol(move.getStartCol());
@@ -178,14 +183,13 @@ public class Board {
             rook.setMoveCount(rook.getMoveCount() - 1);
         }
 
-        // Restore promotion
-        if (move.getPromotionPiece() != null) {
-            // Replace the promoted piece with the original pawn
-            Piece originalPawn = move.getMovedPiece();
-            this.boardState[move.getTargetRow()][move.getTargetCol()] = null;
-            this.boardState[move.getStartRow()][move.getStartCol()] = originalPawn;
-
-        }
+        // TODO: THIS SHOULD NOT BE NEEDED, BUT REMOVING THIS CAUSES INDEX ERROR
+//        if (move.getPromotionPiece() != null) {
+//            // Replace the promoted piece with the original pawn
+//            Piece originalPawn = move.getMovedPiece();
+//            this.boardState[move.getTargetRow()][move.getTargetCol()] = null;
+//            this.boardState[move.getStartRow()][move.getStartCol()] = originalPawn;
+//        }
 
         if (!this.moveHistory.isEmpty()) {
             this.moveHistory.pop();

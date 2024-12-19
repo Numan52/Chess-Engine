@@ -126,7 +126,7 @@ public class Pawn extends Piece {
             if (isPromotionRow(targetRow)) {
                 for (PieceType pieceType : ChessUtils.getPromotionOptions()) {
                     possibleCaptures.add(
-                            new Move(this.getRow(), this.getCol(), targetRow, this.getCol(), this,
+                            new Move(this.getRow(), this.getCol(), targetRow, targetCol, this,
                                     capturedPiece, false, false, pieceType ));
                 }
             } else {
