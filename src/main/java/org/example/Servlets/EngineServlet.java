@@ -7,10 +7,7 @@ import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import org.example.*;
-import org.example.Evaluation.KingSafetyEvaluater;
-import org.example.Evaluation.PawnEvaluater;
-import org.example.Evaluation.PositionEvaluater;
-import org.example.Evaluation.TranspositionTable;
+import org.example.Evaluation.*;
 import org.example.Utils.ChessUtils;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -29,10 +26,11 @@ public class EngineServlet extends HttpServlet {
         ZobristHash zobristHash = new ZobristHash();
         Board board = new Board(zobristHash);
         KingSafetyEvaluater kingSafetyEvaluater = new KingSafetyEvaluater(board);
+        ActivityEvaluator activityEvaluator = new ActivityEvaluator(board);
         PawnEvaluater pawnEvaluater = new PawnEvaluater(board);
-        PositionEvaluater positionEvaluater = new PositionEvaluater(board, List.of(pawnEvaluater, kingSafetyEvaluater));
+        PositionEvaluater positionEvaluater = new PositionEvaluater(board, List.of(pawnEvaluater, kingSafetyEvaluater, activityEvaluator));
         TranspositionTable transpositionTable = new TranspositionTable();
-        Searcher searcher = new Searcher(board, 8, 180000, positionEvaluater, transpositionTable);
+        Searcher searcher = new Searcher(board, 8, 1000000, positionEvaluater, transpositionTable);
         ChessEngine chessEngine = new ChessEngine(board, searcher, positionEvaluater, zobristHash);
 
 
@@ -64,31 +62,21 @@ public class EngineServlet extends HttpServlet {
             return;
         }
 
-        System.out.println("fen: " + fen);
 
        chessEngine.updateBoard(fen);
-       System.out.println(board.toString());
 
-//        for (Move move : moves) {
-//            System.out.println(move.toString());
-//        }
+
 
         MoveScore bestMove = chessEngine.calculateBestMove();
-        System.out.println(bestMove.move);
-//        System.out.println(Arrays.deepToString(board.getBoardState()));
-//        for (Piece[] piecesRow : board.getBoardState()) {
-//            for (Piece piece : piecesRow) {
-//                if (piece != null) {
-//                    System.out.println(piece.toString());
-//                }
-//            }
-//        }
+        System.out.println("Best Move: " + bestMove.move);
+        System.out.println("Score: " + bestMove.score);
+
+        System.out.println(board.toString());
 
 
         JSONObject jsonResponse = new JSONObject();
         jsonResponse.put("from", ChessUtils.toAlgebraicNotation(bestMove.move.getStartRow(), bestMove.move.getStartCol()));
         jsonResponse.put("to", ChessUtils.toAlgebraicNotation(bestMove.move.getTargetRow(), bestMove.move.getTargetCol()));
-        // TODO: RESET ISTIMEUP
         response.setContentType("application/json");
         response.setStatus(200);
         response.getOutputStream().println(jsonResponse.toString());

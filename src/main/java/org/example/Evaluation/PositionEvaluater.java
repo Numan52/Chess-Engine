@@ -1,21 +1,18 @@
 package org.example.Evaluation;
 
 import org.example.Board;
-import org.example.Piece.King;
 import org.example.Piece.Piece;
-import org.example.Piece.PieceType;
 
-import java.util.ArrayList;
 import java.util.List;
 
 public class PositionEvaluater {
     private Board board;
-    private List<PieceEvaluater> pieceEvaluaters;
+    private List<Evaluator> evaluators;
 
 
-    public PositionEvaluater(Board board, List<PieceEvaluater> pieceEvaluaters) {
+    public PositionEvaluater(Board board, List<Evaluator> evaluators) {
         this.board = board;
-        this.pieceEvaluaters = pieceEvaluaters;
+        this.evaluators = evaluators;
     }
 
     public int evaluatePosition(int depth) {
@@ -41,8 +38,8 @@ public class PositionEvaluater {
             }
         }
 
-        for (PieceEvaluater pieceEvaluater : pieceEvaluaters) {
-            evaluation += pieceEvaluater.evaluate();
+        for (Evaluator evaluator : evaluators) {
+            evaluation += evaluator.evaluate();
         }
 
         return evaluation;

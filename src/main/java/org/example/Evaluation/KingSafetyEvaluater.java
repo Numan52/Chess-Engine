@@ -4,9 +4,8 @@ import org.example.Board;
 import org.example.Piece.King;
 import org.example.Piece.Piece;
 import org.example.Piece.PieceType;
-import org.example.Piece.Rook;
 
-public class KingSafetyEvaluater implements PieceEvaluater{
+public class KingSafetyEvaluater implements Evaluator {
     private Board board;
 
     // TODO: ENDGAME HANDLING

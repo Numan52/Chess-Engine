@@ -8,7 +8,7 @@ import org.example.Piece.PieceType;
 import java.util.ArrayList;
 import java.util.List;
 
-public class PawnEvaluater implements PieceEvaluater {
+public class PawnEvaluater implements Evaluator {
     private Board board;
 
 

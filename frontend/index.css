@@ -3,7 +3,9 @@
     justify-content: center;
     gap: 20px;
     flex-direction: row;
+    
     margin-top: 50px;
+    max-width: 100vw;
 }
 
 
@@ -11,6 +13,15 @@ body {
     font-size: 1.4rem;
 }
 
+.notification {
+    text-align: center;
+    margin-bottom: 0;
+}
+
+
+#board {
+    width: 700px;
+}
 
 #info-container {
     display: flex;
@@ -42,4 +53,21 @@ body {
 
 .hidden {
     display: none !important;
+}
+
+
+@media (max-width: 768px) {
+    #board-container {
+        flex-direction: column; 
+        align-items: center; 
+        max-width: 100vw;
+    }
+
+    #board {
+        width: 200px;
+    }
+
+    #info-container {
+        width: 80vw; /* Adjust the width of the info-container */
+    }
 }

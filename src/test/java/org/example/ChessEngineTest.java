@@ -1,9 +1,6 @@
 package org.example;
 
-import org.example.Evaluation.KingSafetyEvaluater;
-import org.example.Evaluation.PawnEvaluater;
-import org.example.Evaluation.PositionEvaluater;
-import org.example.Evaluation.TranspositionTable;
+import org.example.Evaluation.*;
 import org.example.Piece.Pawn;
 import org.example.Piece.Piece;
 import org.example.Piece.PieceType;
@@ -20,6 +17,7 @@ import java.util.List;
 public class ChessEngineTest {
     private Board board;
     private KingSafetyEvaluater kingSafetyEvaluater;
+    private ActivityEvaluator activityEvaluator;
     private PawnEvaluater pawnEvaluater;
     private PositionEvaluater positionEvaluater;
     private Searcher searcher;
@@ -33,8 +31,9 @@ public class ChessEngineTest {
         transpositionTable = new TranspositionTable();
         board = new Board(zobristHash);
         kingSafetyEvaluater = new KingSafetyEvaluater(board);
+        activityEvaluator = new ActivityEvaluator(board);
         pawnEvaluater = new PawnEvaluater(board);
-        positionEvaluater = new PositionEvaluater(board, List.of(kingSafetyEvaluater, pawnEvaluater));
+        positionEvaluater = new PositionEvaluater(board, List.of(kingSafetyEvaluater, pawnEvaluater, activityEvaluator));
         searcher = new Searcher(board, 8, 1000000, positionEvaluater, transpositionTable);
         chessEngine = new ChessEngine(board, searcher, positionEvaluater, zobristHash);
     }
@@ -129,17 +128,18 @@ public class ChessEngineTest {
         Assert.assertEquals(2, queen.getRow());
         Assert.assertEquals(5, queen.getCol());
         Assert.assertEquals(queen, board.getBoardState()[2][5]);
-
+        System.out.println(board.toString());
 
         Move move = new Move(2, 5, 3, 4, queen, capturedPawn, false, false, null );
         board.makeMove(move);
 
+        System.out.println(board.toString());
         Assert.assertEquals(3, queen.getRow());
         Assert.assertEquals(4, queen.getCol());
         Assert.assertEquals(queen, board.getBoardState()[3][4]);
 
         board.undoMove(move);
-
+        System.out.println(board.toString());
         Assert.assertEquals(2, queen.getRow());
         Assert.assertEquals(5, queen.getCol());
         Assert.assertEquals(queen, board.getBoardState()[2][5]);
@@ -313,6 +313,51 @@ public class ChessEngineTest {
 
     }
 
+
+    @Test
+    public void testMove() {
+        chessEngine.updateBoard("rnbqkbnr/1ppppppp/8/8/p3P3/2N2N2/PPPP1PPP/R1BQKB1R b KQkq - 1 3");
+
+
+        MoveScore moveScore = chessEngine.calculateBestMove();
+        System.out.println(moveScore.move);
+        System.out.println(moveScore.score);
+
+        Piece movedPiece = moveScore.move.getMovedPiece();
+    }
+
+    @Test
+    public void testEvaluationPlusTwo() {
+        chessEngine.updateBoard("rnbqkbnr/2p2ppp/pp1p4/4p3/2B1P3/2NP1N2/PPPB1PPP/R2QK2R w KQkq - 3 7");
+
+        int evaluation = positionEvaluater.evaluatePosition(0);
+
+        System.out.println(evaluation);
+
+
+    }
+
+    @Test
+    public void testEvaluationEqual() {
+        chessEngine.updateBoard("rnbqkb1r/2p2ppp/pp1p1n2/4p3/2B1P3/2NP1N2/PPPB1PPP/R2QK2R b KQkq - 2 6");
+
+        int evaluation = positionEvaluater.evaluatePosition(0);
+
+        System.out.println(evaluation);
+
+
+    }
+
+    @Test
+    public void testEvaluationSymmetricPosition() {
+        chessEngine.updateBoard("r1bq1rk1/ppp2ppp/2np1n2/2b1p3/2B1P3/2NP1N2/PPP2PPP/R1BQ1RK1 w - - 4 7");
+
+        int evaluation = positionEvaluater.evaluatePosition(0);
+
+        System.out.println(evaluation);
+
+
+    }
 
 
 
