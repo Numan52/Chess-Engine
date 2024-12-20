@@ -38,13 +38,9 @@ public class BoardParser {
                 char color = Character.isUpperCase(rows[i].charAt(j)) ? 'w' : 'b';
                 char type = Character.toUpperCase(rows[i].charAt(j));
                 Piece piece = createPiece(board, 7 - i, col, color, type);
-                if (piece.getType() == PieceType.KING) {
-                    if (piece.getIsWhite()) {
-                        board.setWhiteKing((King) piece);
-                    } else {
-                        board.setBlackKing((King) piece);
-                    }
-                }
+
+                initializeReferences(board, piece);
+
                 boardState[7 - i][col] = piece;
                 col++;
             }
@@ -52,6 +48,22 @@ public class BoardParser {
         return boardState;
     }
 
+
+    public static void initializeReferences(Board board, Piece piece) {
+        if (piece.getIsWhite()) {
+            if (piece.getType() == PieceType.KING) {
+                board.setWhiteKing((King) piece);
+            } else {
+                board.getWhitePieces().add(piece);
+            }
+        } else {
+            if (piece.getType() == PieceType.KING) {
+                board.setBlackKing((King) piece);
+            } else {
+                board.getBlackPieces().add(piece);
+            }
+        }
+    }
 
 
     public static String getEnPassantField(String fen) {

@@ -14,7 +14,8 @@ public class Move {
     private final Piece capturedPiece;
     private final boolean isCastling;
     private final boolean isEnPassant;
-    private final PieceType promotionPiece;
+    private final PieceType promotionPieceType;
+    private Piece promotionPiece;
     private int previousCastlingRights; // 4 bits - qkQK
 
     public Move(int startRow, int startCol, int targetRow, int targetCol, Piece movedPiece, Piece capturedPiece,
@@ -27,7 +28,8 @@ public class Move {
         this.capturedPiece = capturedPiece;
         this.isCastling = isCastling;
         this.isEnPassant = isEnPassant;
-        this.promotionPiece = promotionPieceType;
+        this.promotionPieceType = promotionPieceType;
+        this.promotionPiece = null;
     }
 
     public Move(int startRow, int startCol, int targetRow, int targetCol, Piece movedPiece) {
@@ -67,8 +69,8 @@ public class Move {
         return isEnPassant;
     }
 
-    public PieceType getPromotionPiece() {
-        return promotionPiece;
+    public PieceType getPromotionPieceType() {
+        return promotionPieceType;
     }
 
     public int getPreviousCastlingRights() {
@@ -77,6 +79,14 @@ public class Move {
 
     public void setPreviousCastlingRights(int previousCastlingRights) {
         this.previousCastlingRights = previousCastlingRights;
+    }
+
+    public Piece getPromotionPiece() {
+        return promotionPiece;
+    }
+
+    public void setPromotionPiece(Piece promotionPiece) {
+        this.promotionPiece = promotionPiece;
     }
 
     @Override
@@ -95,11 +105,11 @@ public class Move {
     public boolean equals(Object o) {
         if (o == null || getClass() != o.getClass()) return false;
         Move move = (Move) o;
-        return startRow == move.startRow && startCol == move.startCol && targetRow == move.targetRow && targetCol == move.targetCol && isCastling == move.isCastling && isEnPassant == move.isEnPassant && Objects.equals(movedPiece, move.movedPiece) && Objects.equals(capturedPiece, move.capturedPiece) && promotionPiece == move.promotionPiece;
+        return startRow == move.startRow && startCol == move.startCol && targetRow == move.targetRow && targetCol == move.targetCol && isCastling == move.isCastling && isEnPassant == move.isEnPassant && Objects.equals(movedPiece, move.movedPiece) && Objects.equals(capturedPiece, move.capturedPiece) && promotionPieceType == move.promotionPieceType;
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(startRow, startCol, targetRow, targetCol, movedPiece, capturedPiece, isCastling, isEnPassant, promotionPiece, previousCastlingRights);
+        return Objects.hash(startRow, startCol, targetRow, targetCol, movedPiece, capturedPiece, isCastling, isEnPassant, promotionPieceType, previousCastlingRights);
     }
 }

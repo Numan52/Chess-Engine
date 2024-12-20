@@ -20,9 +20,12 @@ public class Board {
     private String enPassantField;
     private int castlingRights; // 4 bits - qkQK
     private Searcher searcher;
+    // Without Kings
+    private List<Piece> whitePieces;
+    private List<Piece> blackPieces;
+
     private King whiteKing;
     private King blackKing;
-
     private ZobristHash zobristHasher;
     private long positionHash;
 
@@ -36,6 +39,8 @@ public class Board {
         this.blackKing = null;
         this.positionHash = 0;
         this.zobristHasher = zobristHasher;
+        this.whitePieces = new ArrayList<>();
+        this.blackPieces = new ArrayList<>();
 
     }
 
@@ -82,6 +87,13 @@ public class Board {
         this.boardState[move.getStartRow()][move.getStartCol()] = null;
         this.boardState[move.getTargetRow()][move.getTargetCol()] = move.getMovedPiece();
 
+        if (move.getCapturedPiece() != null) {
+            if (move.getCapturedPiece().getIsWhite()) {
+                whitePieces.remove(move.getCapturedPiece());
+            } else {
+                blackPieces.remove(move.getCapturedPiece());
+            }
+        }
         move.getMovedPiece().setMoveCount(move.getMovedPiece().getMoveCount() + 1);
         move.getMovedPiece().setRow(move.getTargetRow());
         move.getMovedPiece().setCol(move.getTargetCol());
@@ -109,9 +121,9 @@ public class Board {
         }
 
         // handle promotion
-        if (move.getPromotionPiece() != null) {
+        if (move.getPromotionPieceType() != null) {
             char pieceColor = move.getMovedPiece().getIsWhite() ? 'w' : 'b';
-            char type = move.getPromotionPiece() == PieceType.KNIGHT ?
+            char type = move.getPromotionPieceType() == PieceType.KNIGHT ?
                     'N' : Character.toUpperCase(move.getMovedPiece().getType().toString().charAt(0));
 
             Piece promotionPiece = BoardParser.createPiece(this, move.getTargetRow(), move.getTargetCol(), pieceColor, type);
@@ -119,6 +131,12 @@ public class Board {
             promotionPiece.setRow(move.getTargetRow());
             promotionPiece.setCol(move.getTargetCol());
             promotionPiece.setMoveCount(1); // Promotion counts as the first move
+            move.setPromotionPiece(promotionPiece);
+
+            if (move.getMovedPiece().getIsWhite()){
+                whitePieces.remove(move.getMovedPiece());
+                whitePieces.add(promotionPiece);
+            }
         }
 
         this.moveHistory.push(move);
@@ -155,6 +173,14 @@ public class Board {
             this.boardState[move.getTargetRow()][move.getTargetCol()] = null;
         }
 
+        if (move.getCapturedPiece() != null) {
+            if (move.getCapturedPiece().getIsWhite()) {
+                whitePieces.add(move.getCapturedPiece());
+            }
+            else {
+                blackPieces.add(move.getCapturedPiece());
+            }
+        }
 
         move.getMovedPiece().setRow(move.getStartRow());
         move.getMovedPiece().setCol(move.getStartCol());
@@ -183,13 +209,16 @@ public class Board {
             rook.setMoveCount(rook.getMoveCount() - 1);
         }
 
-        // TODO: THIS SHOULD NOT BE NEEDED, BUT REMOVING THIS CAUSES INDEX ERROR
-//        if (move.getPromotionPiece() != null) {
-//            // Replace the promoted piece with the original pawn
-//            Piece originalPawn = move.getMovedPiece();
-//            this.boardState[move.getTargetRow()][move.getTargetCol()] = null;
-//            this.boardState[move.getStartRow()][move.getStartCol()] = originalPawn;
-//        }
+        if (move.getPromotionPieceType() != null) {
+            if (move.getMovedPiece().getIsWhite()) {
+                whitePieces.remove(move.getPromotionPiece());
+                whitePieces.add(move.getMovedPiece());
+            } else {
+                blackPieces.remove(move.getPromotionPiece());
+                blackPieces.add(move.getMovedPiece());
+            }
+        }
+
 
         if (!this.moveHistory.isEmpty()) {
             this.moveHistory.pop();
@@ -445,6 +474,15 @@ public class Board {
 
     public void setPositionHash(long positionHash) {
         this.positionHash = positionHash;
+    }
+
+
+    public List<Piece> getWhitePieces() {
+        return whitePieces;
+    }
+
+    public List<Piece> getBlackPieces() {
+        return blackPieces;
     }
 
 
