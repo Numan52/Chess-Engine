@@ -30,7 +30,7 @@ public class EngineServlet extends HttpServlet {
         PawnEvaluater pawnEvaluater = new PawnEvaluater(board);
         PositionEvaluater positionEvaluater = new PositionEvaluater(board, List.of(pawnEvaluater, kingSafetyEvaluater, activityEvaluator));
         TranspositionTable transpositionTable = new TranspositionTable();
-        Searcher searcher = new Searcher(board, 8, 1000000, positionEvaluater, transpositionTable);
+        Searcher searcher = new Searcher(board, 12, 30000, positionEvaluater, transpositionTable);
         ChessEngine chessEngine = new ChessEngine(board, searcher, positionEvaluater, zobristHash);
 
 
@@ -70,7 +70,7 @@ public class EngineServlet extends HttpServlet {
         MoveScore bestMove = chessEngine.calculateBestMove();
         System.out.println("Best Move: " + bestMove.move);
         System.out.println("Score: " + bestMove.score);
-
+        System.out.println("Sequence: " + bestMove.movePath);
         System.out.println(board.toString());
 
         JSONObject jsonResponse = new JSONObject();

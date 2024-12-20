@@ -149,17 +149,17 @@ public class KingSafetyEvaluater implements Evaluator {
             for (int col = 0; col < kingCol; col++) {
                 Piece piece = board.getBoardState()[kingRow][col];
                 if (piece != null && piece.getType() == PieceType.ROOK &&
-                        piece.getIsWhite() == king.getIsWhite() && piece.getCol() < kingCol) {
+                        piece.getIsWhite() == king.getIsWhite()) {
                     return true;
                 }
             }
         }
 
         if (kingCol >= 4) {
-            for (int col = Math.min(7, kingCol + 1); col < 7; col++) {
+            for (int col = Math.min(7, kingCol + 1); col < 8; col++) {
                 Piece piece = board.getBoardState()[kingRow][col];
                 if (piece != null && piece.getType() == PieceType.ROOK &&
-                        piece.getIsWhite() == king.getIsWhite() && piece.getCol() > kingCol) {
+                        piece.getIsWhite() == king.getIsWhite()) {
                     return true;
                 }
             }

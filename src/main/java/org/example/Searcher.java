@@ -44,6 +44,7 @@ public class Searcher {
 
         if (depth == 0 || board.getIsCheckmate()) {
             return new MoveScore(null, positionEvaluater.evaluatePosition(depth), new ArrayList<>());
+
         }
         // TODO: random PIECES ARE SPAWNING ON THE BOARD
         TranspositionTable.TranspositionEntry entry = transpositionTable.lookup(board.getPositionHash());

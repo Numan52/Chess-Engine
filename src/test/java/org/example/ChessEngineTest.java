@@ -33,8 +33,8 @@ public class ChessEngineTest {
         kingSafetyEvaluater = new KingSafetyEvaluater(board);
         activityEvaluator = new ActivityEvaluator(board);
         pawnEvaluater = new PawnEvaluater(board);
-        positionEvaluater = new PositionEvaluater(board, List.of(kingSafetyEvaluater, pawnEvaluater, activityEvaluator));
-        searcher = new Searcher(board, 8, 1000000, positionEvaluater, transpositionTable);
+        positionEvaluater = new PositionEvaluater(board, List.of(kingSafetyEvaluater, activityEvaluator, pawnEvaluater));
+        searcher = new Searcher(board, 8, 30000, positionEvaluater, transpositionTable);
         chessEngine = new ChessEngine(board, searcher, positionEvaluater, zobristHash);
     }
 
@@ -358,6 +358,80 @@ public class ChessEngineTest {
 
 
     }
+
+    @Test
+    public void testPawnCenterEvaluation() {
+        chessEngine.updateBoard("rnbqkbnr/pppp1ppp/4p3/8/4P3/8/PPPP1PPP/RNBQKBNR w KQkq - 0 2");
+
+        int evaluation = positionEvaluater.evaluatePosition(0);
+
+        System.out.println(evaluation);
+
+
+    }
+
+    @Test
+    public void testMoveSequenceAfterE4() {
+        chessEngine.updateBoard("r1bqkbnr/pppp1p1p/2n1p1p1/1Q6/4P3/5N2/PPPP1PPP/RNB1KB1R b KQkq - 1 4");
+        // 145
+        int evaluation = positionEvaluater.evaluatePosition(0);
+
+        System.out.println(evaluation);
+
+
+    }
+
+
+    @Test
+    public void testCompareEvaluationsCastledWithNotCastled() {
+        chessEngine.updateBoard("rn1qkb1r/pppb1ppp/3p1n2/1B2p3/4P3/2N2N2/PPPP1PPP/R1BQ1RK1 b kq - 5 5");
+
+        int evaluation = positionEvaluater.evaluatePosition(0);
+        System.out.println("castled eval: " + evaluation);
+
+
+        chessEngine.updateBoard("rn1qkb1r/pppb1ppp/3p1n2/1B2p3/4P3/2N2N2/PPPP1PPP/R1BQK2R w KQkq - 4 5");
+        int evaluation2 = positionEvaluater.evaluatePosition(0);
+        System.out.println("non-castled eval: " + evaluation2);
+
+
+    }
+
+
+    @Test
+    public void testCompareEvaluationsKing2ndRowWith1stRow() {
+        chessEngine.updateBoard("rn1qkb1r/pppb1ppp/3p1n2/1B2p3/4P3/2N2N2/PPPPKPPP/R1BQ3R b kq - 5 5");
+
+        int evaluation = positionEvaluater.evaluatePosition(0);
+        System.out.println("2nd row eval: " + evaluation);
+
+
+        chessEngine.updateBoard("rn1qkb1r/pppb1ppp/3p1n2/1B2p3/4P3/2N2N2/PPPP1PPP/R1BQK2R b KQkq - 4 5");
+        int evaluation2 = positionEvaluater.evaluatePosition(0);
+        System.out.println("1st row eval: " + evaluation2);
+
+
+    }
+
+
+
+
+    @Test
+    public void testKingCastles() {
+        chessEngine.updateBoard("r2qkb1r/pppn1ppp/3p1n2/4p3/4P3/2N2N2/PPPP1PPP/R1BQK2R w KQkq - 0 6");
+
+        int evaluation = positionEvaluater.evaluatePosition(0);
+        System.out.println("current eval: " + evaluation);
+
+        MoveScore moveScore = chessEngine.calculateBestMove();
+        System.out.println(moveScore.move);
+        System.out.println(moveScore.score);
+        System.out.println(moveScore.movePath);
+
+    }
+
+
+
 
 
 

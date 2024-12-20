@@ -18,9 +18,11 @@ public class ActivityEvaluator implements Evaluator {
 
         evaluation -= evaluateDevelopment(true);
         evaluation += evaluateDevelopment(false);
-
+//        System.out.println("knight and bishop development eval: " + evaluation);
         evaluation -= evaluateCenterControl(true);
         evaluation += evaluateCenterControl(false);
+//        System.out.println("CENTER control eval: " + evaluation);
+
 
         return evaluation;
     }
@@ -68,7 +70,7 @@ public class ActivityEvaluator implements Evaluator {
         Piece[][] boardState = board.getBoardState();
         int row = isWhite ? 0 : 7;
         int firstCol = 2;
-        int secondCol = 5;
+        int secondCol = 5;  
 
         boolean isFirstUndeveloped = isPieceType(row, firstCol, PieceType.BISHOP, isWhite);
         boolean isSecondUndeveloped = isPieceType(row, secondCol, PieceType.BISHOP, isWhite);;
@@ -135,5 +137,12 @@ public class ActivityEvaluator implements Evaluator {
         }
 
         return penalty;
+    }
+
+
+    public int evaluateBishopMobility(boolean isWhite) {
+        int penalty = 0;
+
+        return 0;
     }
 }
