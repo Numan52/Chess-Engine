@@ -20,7 +20,6 @@ public class Board {
     private String enPassantField;
     private int castlingRights; // 4 bits - qkQK
     private Searcher searcher;
-    // Without Kings
     private List<Piece> whitePieces;
     private List<Piece> blackPieces;
 
@@ -49,12 +48,10 @@ public class Board {
     // depth parameter is only needed for killer moves
     public List<Move> getAllPossibleMoves(int depth) {
         List<Move> allMoves = new ArrayList<>();
-        for (Piece[] pieceRow : getBoardState()) {
-            for (Piece piece : pieceRow) {
-                if (piece != null && piece.getIsWhite() == isWhitesTurn) {
-                    allMoves.addAll(piece.generatePossibleMoves());
-                }
-            }
+        List<Piece> activePieces = this.getIsWhitesTurn() ? this.getWhitePieces() : this.getBlackPieces();
+
+        for (Piece piece : activePieces) {
+            allMoves.addAll(piece.generatePossibleMoves());
         }
 
         ChessUtils.removeIllegalMoves(this, allMoves);
@@ -159,6 +156,7 @@ public class Board {
 
         positionHash = zobristHasher.updatePositionHash(positionHash, move);
     }
+
 
     // TODO: EN PASSANT, CASTLING OR PROMOTION CAUSES INCONSISTENCIES IN BOARD STATE
     public void undoMove(Move move) {
@@ -349,28 +347,7 @@ public class Board {
 
     // TODO: CHECK IF THIS WORKS
     public King getKing(boolean isWhite) {
-        King king = isWhite ? this.whiteKing : this.blackKing;
-        if (king != null) {
-            return king;
-        }
-
-        for (Piece[] pieceRow : getBoardState()) {
-            for (Piece piece : pieceRow) {
-                if (piece != null) {
-                    if (isWhite) {
-                        if (piece.getType() == PieceType.KING && piece.getIsWhite()) {
-                            return (King) piece;
-                        }
-                    }
-                    else {
-                        if (piece.getType() == PieceType.KING && !piece.getIsWhite()) {
-                            return (King) piece;
-                        }
-                    }
-                }
-            }
-        }
-        return null;
+        return isWhite ? this.whiteKing : this.blackKing;
     }
 
 

@@ -34,7 +34,7 @@ public class ChessEngineTest {
         activityEvaluator = new ActivityEvaluator(board);
         pawnEvaluater = new PawnEvaluater(board);
         positionEvaluater = new PositionEvaluater(board, List.of(kingSafetyEvaluater, activityEvaluator, pawnEvaluater));
-        searcher = new Searcher(board, 8, 30000, positionEvaluater, transpositionTable);
+        searcher = new Searcher(board, 8, 15000, positionEvaluater, transpositionTable);
         chessEngine = new ChessEngine(board, searcher, positionEvaluater, zobristHash);
     }
 

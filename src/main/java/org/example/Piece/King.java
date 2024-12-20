@@ -142,25 +142,23 @@ public class King extends Piece {
         for (int[] square : squares) {
             int row = square[0];
             int col = square[1];
-            for (Piece[] rowPieces : getChessboard().getBoardState()) {
-                for (Piece piece : rowPieces) {
-                    if (piece != null && piece.getIsWhite() != this.getIsWhite()) {
-                        if (piece.getType() == PieceType.KING) {
-                            // For Kings, use canAttack to avoid cyclic dependency between areSquaresUnderAttack() and canMoveTo()
-                            if (((King) piece).canAttack(row, col)) {
-                                return true;
-                            }
-                        } else {
-                            if (piece.canMoveTo(row, col)) {
-                                return true;
-                            }
+            List<Piece> activePieces = this.getIsWhite() ? getChessboard().getBlackPieces() : getChessboard().getWhitePieces();
 
-                        }
+            for (Piece piece : activePieces) {
+                if (piece.getType() == PieceType.KING) {
+                    // For Kings, use canAttack to avoid cyclic dependency between areSquaresUnderAttack() and canMoveTo()
+                    if (((King) piece).canAttack(row, col)) {
+                        return true;
+                    }
+                } else {
+                    if (piece.canMoveTo(row, col)) {
+                        return true;
                     }
 
                 }
             }
         }
+
         return false;
     }
 

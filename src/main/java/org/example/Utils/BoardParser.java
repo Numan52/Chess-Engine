@@ -53,15 +53,14 @@ public class BoardParser {
         if (piece.getIsWhite()) {
             if (piece.getType() == PieceType.KING) {
                 board.setWhiteKing((King) piece);
-            } else {
-                board.getWhitePieces().add(piece);
             }
+            board.getWhitePieces().add(piece);
         } else {
             if (piece.getType() == PieceType.KING) {
                 board.setBlackKing((King) piece);
-            } else {
-                board.getBlackPieces().add(piece);
             }
+            board.getBlackPieces().add(piece);
+
         }
     }
 
