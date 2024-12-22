@@ -22,7 +22,8 @@ public class Board {
     private Searcher searcher;
     private List<Piece> whitePieces;
     private List<Piece> blackPieces;
-
+    private boolean isOpeningPhase; // TODO: track game phase for optimal evaluation
+    private boolean isEndgamePhase;
     private King whiteKing;
     private King blackKing;
     private ZobristHash zobristHasher;
@@ -40,7 +41,8 @@ public class Board {
         this.zobristHasher = zobristHasher;
         this.whitePieces = new ArrayList<>();
         this.blackPieces = new ArrayList<>();
-
+        this.isOpeningPhase = false;
+        this.isEndgamePhase = false;
     }
 
     // TODO: HANDLE MOVES THAT LEAD TO CHECKMATE
@@ -67,7 +69,7 @@ public class Board {
             }
 
         }
-
+        // TODO: SORT QUIET MOVES
         ChessUtils.sortCaptures(captures);
         ChessUtils.sortMovesByKillers(searcher, quietMoves, depth); // TODO: CHECK IF KILLER HEURISTIC WORKS CORRECTLY
 
@@ -121,7 +123,7 @@ public class Board {
         if (move.getPromotionPieceType() != null) {
             char pieceColor = move.getMovedPiece().getIsWhite() ? 'w' : 'b';
             char type = move.getPromotionPieceType() == PieceType.KNIGHT ?
-                    'N' : Character.toUpperCase(move.getMovedPiece().getType().toString().charAt(0));
+                    'N' : Character.toUpperCase(move.getPromotionPieceType().toString().charAt(0));
 
             Piece promotionPiece = BoardParser.createPiece(this, move.getTargetRow(), move.getTargetCol(), pieceColor, type);
             this.boardState[move.getTargetRow()][move.getTargetCol()] = promotionPiece;
@@ -462,6 +464,14 @@ public class Board {
         return blackPieces;
     }
 
+
+    public boolean isOpeningPhase() {
+        return isOpeningPhase;
+    }
+
+    public boolean isEndgamePhase() {
+        return isEndgamePhase;
+    }
 
     @Override
     public String toString() {

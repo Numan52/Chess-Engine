@@ -98,8 +98,13 @@ public class Move {
                 ", targetRow=" + targetRow +
                 ", startCol=" + startCol +
                 ", startRow=" + startRow +
+                ", isCastling=" + isCastling +
+                ", isEnPassant=" + isEnPassant +
+                ", promotionPieceType=" + promotionPieceType +
                 '}';
     }
+
+
 
     @Override
     public boolean equals(Object o) {

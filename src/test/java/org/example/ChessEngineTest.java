@@ -414,8 +414,6 @@ public class ChessEngineTest {
     }
 
 
-
-
     @Test
     public void testKingCastles() {
         chessEngine.updateBoard("r2qkb1r/pppn1ppp/3p1n2/4p3/4P3/2N2N2/PPPP1PPP/R1BQK2R w KQkq - 0 6");
@@ -429,6 +427,24 @@ public class ChessEngineTest {
         System.out.println(moveScore.movePath);
 
     }
+
+
+    @Test
+    public void testPreventsEnemyPromotion() {
+        chessEngine.updateBoard("4b3/2P5/8/4k3/8/2KB4/8/8 b - - 0 1");
+
+        int evaluation = positionEvaluater.evaluatePosition(0);
+        System.out.println("current eval: " + evaluation);
+
+        MoveScore moveScore = chessEngine.calculateBestMove();
+        System.out.println(board);
+        System.out.println(moveScore.move);
+        Assert.assertEquals(3, moveScore.move.getTargetCol());
+        Assert.assertEquals(6, moveScore.move.getTargetRow());
+        Assert.assertEquals(PieceType.BISHOP, moveScore.move.getMovedPiece().getType());
+
+    }
+
 
 
 
