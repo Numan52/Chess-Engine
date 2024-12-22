@@ -3,6 +3,9 @@ package org.example.Evaluation;
 import org.example.Board;
 import org.example.Piece.Piece;
 import org.example.Piece.PieceType;
+import org.example.Utils.ChessUtils;
+
+import java.util.List;
 
 public class ActivityEvaluator implements Evaluator {
 
@@ -22,15 +25,11 @@ public class ActivityEvaluator implements Evaluator {
         evaluation -= evaluateCenterControl(true);
         evaluation += evaluateCenterControl(false);
 //        System.out.println("CENTER control eval: " + evaluation);
-
+        evaluation -= (int) evaluateMobility(true);
+        evaluation += (int) evaluateMobility(false);
 
         return evaluation;
     }
-
-
-//    public int evaluateMobility(boolean isWhite) {
-//
-//    }
 
 
     public int evaluateDevelopment(boolean isWhite) {
@@ -118,10 +117,10 @@ public class ActivityEvaluator implements Evaluator {
         boolean eCenterSupport = isPieceType(thirdRow, eFile, PieceType.PAWN, isWhite);
 
         if (dCenterOccupied) {
-            penalty -= 30;
+            penalty -= 40;
         }
         if (eCenterOccupied) {
-            penalty -= 30;
+            penalty -= 40;
         }
         if (cCenterSupport) {
             penalty -= 10;
@@ -140,9 +139,130 @@ public class ActivityEvaluator implements Evaluator {
     }
 
 
-    public int evaluateBishopMobility(boolean isWhite) {
+    public double evaluateMobility(boolean isWhite) {
+        List<Piece> activePieces = isWhite ? board.getWhitePieces() : board.getBlackPieces();
+        double mobility = 0;
         int penalty = 0;
+        int maxKnightMobility = 8;
+        int maxBishopMobility = 13;
+        int maxRookMobility = 14;
 
-        return 0;
+        for (Piece piece : activePieces) {
+            int[][] bishopDirections = {{1, -1}, {1, 1}, {-1, 1}, {-1, -1}};
+
+            if (piece.getType() == PieceType.KNIGHT) {
+                mobility += evaluateKnightMobility(piece);
+                penalty += calculatePenalty(mobility, maxKnightMobility, piece);
+            }
+
+            if (piece.getType() == PieceType.BISHOP) {
+                mobility += evaluateSlidingPieceMobility(piece, bishopDirections);
+                penalty += calculatePenalty(mobility, maxBishopMobility, piece);
+            }
+
+            int[][] rookDirections = {{1, 0}, {0, 1}, {-1, 0}, {0, -1}};
+            if (piece.getType() == PieceType.ROOK) {
+                mobility += evaluateSlidingPieceMobility(piece, rookDirections);
+                penalty += calculatePenalty(mobility, maxRookMobility, piece);
+            }
+
+            int[][] queenDirections = {{1, 0}, {0, 1}, {-1, 0}, {0, -1}, {1, -1}, {1, 1}, {-1, 1}, {-1, -1}};
+            if (piece.getType() == PieceType.QUEEN) {
+                mobility += evaluateSlidingPieceMobility(piece, queenDirections);
+            }
+        }
+        return penalty;
     }
+
+
+
+    private int evaluateKnightMobility(Piece knight) {
+        int[][] squares = {{2, 1}, {1, 2}, {-1, 2}, {-2, 1}, {-2, -1}, {-1, -2}, {1, -2}, {2, -1}};
+        int mobility = 0;
+
+        for (int[] square : squares) {
+            int targetRow = knight.getRow() + square[0];
+            int targetCol = knight.getCol() + square[1];
+
+            if (knight.canMoveTo(targetRow, targetCol)) {
+                mobility++;
+            }
+        }
+
+        return mobility;
+    }
+
+
+
+    private double evaluateSlidingPieceMobility(Piece piece, int[][] directions) {
+        double mobility = 0;
+
+        for (int[] direction : directions) {
+            int currentRow = piece.getRow();
+            int currentCol = piece.getCol();
+
+            while (true) {
+                currentRow += direction[0];
+                currentCol += direction[1];
+
+                if (!ChessUtils.isWithinBoard(currentRow, currentCol)) {
+                    break;
+                }
+
+                Piece blockingPiece = board.getBoardState()[currentRow][currentCol];
+
+                if (blockingPiece == null) {
+                    mobility++;
+                    if (piece.getType() == PieceType.ROOK) {
+                        if (direction[0] == 1 || direction[0] == -1) {
+                            mobility++;
+                        }
+                    }
+
+                    if (piece.getType() == PieceType.BISHOP) {
+                        if (direction[0] == 1) {
+                            mobility++;
+                        }
+                    }
+                } else if (blockingPiece.getIsWhite() != piece.getIsWhite()) {
+                    mobility++;
+                    break;
+
+                } else if (blockingPiece.getIsWhite() == piece.getIsWhite()) {
+                    mobility+= 0.5;
+                    break;
+                } else {
+                    break;
+                }
+            }
+        }
+
+        return mobility;
+    }
+
+
+    public int calculatePenalty(double mobility, int maxMobility, Piece piece) {
+        int penalty = 0;
+        int normalizedMobility = (int) ((mobility * 100) / maxMobility); // value between 0 and 100
+        double multiplier = 1;
+
+        switch (piece.getType()) {
+            case KNIGHT, BISHOP -> multiplier = board.isOpeningPhase() ? 1.5 : 1;
+            case ROOK, QUEEN -> multiplier = board.isEndgamePhase() ? 1.5 : 1;
+        }
+
+
+        if (normalizedMobility == 0) {
+            penalty += 40;
+        } else if (normalizedMobility < 30) {
+            penalty += 25;
+        } else if (normalizedMobility < 60) {
+            penalty += 15;
+        }
+
+        penalty *= multiplier;
+
+        return penalty;
+    }
+
 }

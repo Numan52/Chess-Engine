@@ -30,11 +30,11 @@ public class EngineServlet extends HttpServlet {
         PawnEvaluater pawnEvaluater = new PawnEvaluater(board);
         PositionEvaluater positionEvaluater = new PositionEvaluater(board, List.of(pawnEvaluater, kingSafetyEvaluater, activityEvaluator));
         TranspositionTable transpositionTable = new TranspositionTable();
-        Searcher searcher = new Searcher(board, 12, 30000, positionEvaluater, transpositionTable);
+        Searcher searcher = new Searcher(board, 12, 12000, positionEvaluater, transpositionTable);
         ChessEngine chessEngine = new ChessEngine(board, searcher, positionEvaluater, zobristHash);
 
 
-        System.out.println("yoooooooooooOYOOO");
+
         Gson gson = new Gson();
         StringBuilder jsonBody = new StringBuilder();
 

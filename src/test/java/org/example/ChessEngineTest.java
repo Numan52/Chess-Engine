@@ -446,6 +446,27 @@ public class ChessEngineTest {
     }
 
 
+    @Test
+    public void testPlaysCastlingCheckmateMove() {
+        chessEngine.updateBoard("rn3r2/pbppq1p1/1p2pN2/8/6NP/6P1/PPPPBP1R/R3K1k1 w Q - 5 18");
+
+        int evaluation = positionEvaluater.evaluatePosition(0);
+        System.out.println("current eval: " + evaluation);
+
+        MoveScore moveScore = chessEngine.calculateBestMove();
+        System.out.println(board);
+        System.out.println(moveScore.move);
+
+        Assert.assertEquals(2, moveScore.move.getTargetCol());
+        Assert.assertEquals(0, moveScore.move.getTargetRow());
+        Assert.assertEquals(PieceType.KING, moveScore.move.getMovedPiece().getType());
+
+    }
+
+
+
+
+
 
 
 

@@ -70,6 +70,7 @@ public class Board {
 
         }
         // TODO: SORT QUIET MOVES
+        ChessUtils.sortQuietMoves(quietMoves);
         ChessUtils.sortCaptures(captures);
         ChessUtils.sortMovesByKillers(searcher, quietMoves, depth); // TODO: CHECK IF KILLER HEURISTIC WORKS CORRECTLY
 

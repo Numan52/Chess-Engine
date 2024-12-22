@@ -63,17 +63,39 @@ public class ChessUtils {
         });
     }
 
+    public static void sortQuietMoves(List<Move> quietMoves) {
+        quietMoves.sort((move1, move2) -> {
+            if (move1.getPromotionPieceType() != null && move2.getPromotionPieceType() == null) {
+                return 1;
+            }
+            if (move1.getPromotionPieceType() == null && move2.getPromotionPieceType() != null) {
+                return -1;
+            } else {
+                return 0;
+            }
+        });
+    }
+
     // MVV-LVA
     public static void sortCaptures(List<Move> moves) {
         moves.sort((move1, move2) -> {
+            if (move1.getPromotionPieceType() != null && move2.getPromotionPieceType() == null) {
+                return 1;
+            }
+            if (move1.getPromotionPieceType() == null && move2.getPromotionPieceType() != null) {
+                return -1;
+            }
+
             int moveOneValueDiff = move1.getCapturedPiece().getValue() - move1.getMovedPiece().getValue();
             int moveTwoValueDiff = move2.getCapturedPiece().getValue() - move2.getMovedPiece().getValue();
 
 
             return Integer.compare(moveTwoValueDiff, moveOneValueDiff);
         });
-
     }
+
+
+
 
 
     public static void removeIllegalMoves(Board board, List<Move> moves) {
@@ -102,5 +124,11 @@ public class ChessUtils {
         String position = String.valueOf(colChar) + rowNum;
         return position;
     }
+
+
+    public static boolean isWithinBoard(int targetRow, int targetCol) {
+        return targetRow <= 7 && targetRow >= 0 && targetCol <= 7 && targetCol >= 0;
+    }
+
 
 }
