@@ -131,4 +131,19 @@ public class ChessUtils {
     }
 
 
+    public static boolean isEndgame(Board board) {
+        int totalPieceValue = 0;
+
+        for (Piece piece : board.getWhitePieces()) {
+            totalPieceValue += piece.getValue();
+        }
+
+        for (Piece piece : board.getBlackPieces()) {
+            totalPieceValue += piece.getValue();
+        }
+
+        return totalPieceValue < 14;
+    }
+
+
 }

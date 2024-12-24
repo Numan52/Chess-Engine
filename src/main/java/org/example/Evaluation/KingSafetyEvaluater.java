@@ -20,20 +20,23 @@ public class KingSafetyEvaluater implements Evaluator {
         King whiteKing = board.getWhiteKing();
         King blackKing = board.getBlackKing();
 
-        evaluation -= evaluatePawnShield(whiteKing);
-        evaluation += evaluatePawnShield(blackKing);
+        if (!board.isEndgamePhase()) {
+            evaluation -= evaluatePawnShield(whiteKing);
+            evaluation += evaluatePawnShield(blackKing);
 
-        evaluation -= evaluateFileSafety(whiteKing);
-        evaluation += evaluateFileSafety(blackKing);
+            evaluation -= evaluateFileSafety(whiteKing);
+            evaluation += evaluateFileSafety(blackKing);
 
-//        evaluation -= evaluateKingsRow(whiteKing);
-//        evaluation += evaluateKingsRow(blackKing);
+//            evaluation -= evaluateKingsRow(whiteKing);
+//            evaluation += evaluateKingsRow(blackKing);
 
-        evaluation -= evaluateKingsCol(whiteKing);
-        evaluation += evaluateKingsCol(blackKing);
+            evaluation -= evaluateKingsCol(whiteKing);
+            evaluation += evaluateKingsCol(blackKing);
 
-        evaluation -= evaluateKingCastling(whiteKing);
-        evaluation += evaluateKingCastling(blackKing);
+            evaluation -= evaluateKingCastling(whiteKing);
+            evaluation += evaluateKingCastling(blackKing);
+        }
+
 
         return evaluation;
     }
@@ -45,17 +48,26 @@ public class KingSafetyEvaluater implements Evaluator {
 
         int kingRow = king.getRow();
         int kingCol = king.getCol();
-        int pawnShieldRow = king.getIsWhite() ? kingRow + 1 : kingRow - 1;
+        int pawnShieldRow = king.getIsWhite() ? kingRow + 1 : kingRow - 1; // pawn shield only matters if king is on first 3 rows
+
 
         // check the 3 protecting pawns in front of king
-        for (int col = Math.max(0, kingCol - 1); col <= Math.min(7, kingCol + 1); col++) {
-            Piece piece = board.getBoardState()[pawnShieldRow][col];
-            if (piece != null && piece.getType() == PieceType.PAWN && piece.getIsWhite() == king.getIsWhite()) {
-                penalty -= 30;  // minus = bonus
+        if (checkPawnshieldApplies(king)) {
+            for (int col = Math.max(0, kingCol - 1); col <= Math.min(7, kingCol + 1); col++) {
+                Piece piece = board.getBoardState()[pawnShieldRow][col];
+                if (piece != null && piece.getType() == PieceType.PAWN && piece.getIsWhite() == king.getIsWhite()) {
+                    penalty -= 30;  // minus == bonus
+                }
             }
         }
 
+
         return penalty;
+    }
+
+    public boolean checkPawnshieldApplies(Piece king) {
+        int[] validRows = king.getIsWhite() ? new int[]{0, 1, 2} : new int[]{7, 6, 5};
+        return !board.isEndgamePhase() && king.getCol() != 3 && king.getCol() != 4 && king.getRow() ==  validRows[0] && king.getRow() == validRows[1] && king.getRow() == validRows[2];
     }
 
 
@@ -67,7 +79,7 @@ public class KingSafetyEvaluater implements Evaluator {
 
 
         for (int col = Math.max(0, kingCol - 1); col <= Math.min(7, kingCol + 1); col++) {
-            for (int row = 0; row < board.getBoardState().length; row++) {
+            for (int row = 1; row < board.getBoardState().length - 1; row++) {
                 Piece piece = board.getBoardState()[row][col];
                 if (piece != null && piece.getType() == PieceType.PAWN ) {
                     if (piece.getIsWhite() == king.getIsWhite()) {
@@ -80,11 +92,11 @@ public class KingSafetyEvaluater implements Evaluator {
 
             }
             if (!hasOppPawn && !hasFriendlyPawn) {
-                penalty += 60;
-            } else if (hasOppPawn && !hasFriendlyPawn) {
                 penalty += 50;
+            } else if (hasOppPawn && !hasFriendlyPawn) {
+                penalty += 25;
             } else if (!hasOppPawn && hasFriendlyPawn) {
-                penalty += 40;
+                penalty += 20;
             }
         }
 

@@ -40,14 +40,25 @@ async function onDrop (source, target) {
 
   displayLoadingMsg()
   // computer move
-  const moveData = await getComputerMove(game.fen())
-  console.log(moveData)
+  try {
+    const moveData = await getComputerMove(game.fen())
 
-  game.move({
-    from: moveData.from,
-    to: moveData.to,
-    promotion: 'q'
-  })
+    removeErrorMsg()
+
+    console.log(moveData)
+    
+    game.move({
+      from: moveData.from,
+      to: moveData.to,
+      promotion: 'q'
+    })
+  } catch (error) {
+    console.log("An Error occurred.")
+    removeLoadingMsg()
+    displayErrorMsg()
+    return
+  }
+ 
 
   removeLoadingMsg()
   updateStatus()
@@ -60,6 +71,16 @@ function displayLoadingMsg() {
   loadingContainer.classList.remove("hidden")
 }
 
+
+function displayErrorMsg() {
+  const errorContainer = document.getElementById("error-msg")
+  errorContainer.classList.remove("hidden")
+}
+
+function removeErrorMsg() {
+  const errorContainer = document.getElementById("error-msg")
+  errorContainer.classList.add("hidden")
+}
 
 function removeLoadingMsg() {
   const loadingContainer = document.getElementById("loading-container")

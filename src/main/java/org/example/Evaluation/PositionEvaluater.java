@@ -46,10 +46,12 @@ public class PositionEvaluater {
     }
 
     public int applyPieceSquareTable(Piece piece) {
+        boolean isEndgame = board.isEndgamePhase();
+
         if (piece.getIsWhite()) {
-            return piece.getPieceSquareTable()[7 - piece.getRow()][piece.getCol()];
+            return piece.getPieceSquareTable(isEndgame)[7 - piece.getRow()][piece.getCol()];
         } else {
-            return piece.getPieceSquareTable()[piece.getRow()][piece.getCol()];
+            return piece.getPieceSquareTable(isEndgame)[piece.getRow()][piece.getCol()];
         }
     }
 

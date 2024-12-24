@@ -139,8 +139,7 @@ public class Board {
             }
         }
 
-        this.moveHistory.push(move);
-        this.lastMove = move;
+
 
 //        System.out.println(this.toString());
 
@@ -155,13 +154,21 @@ public class Board {
             }
         }
 
-        setIsWhitesTurn(!getIsWhitesTurn());
 
+        this.moveHistory.push(move);
+        this.lastMove = move;
+        if (isEndgamePhase()) {
+            this.isEndgamePhase = true;
+        }
+
+        setIsWhitesTurn(!getIsWhitesTurn());
         positionHash = zobristHasher.updatePositionHash(positionHash, move);
+
+
     }
 
 
-    // TODO: EN PASSANT, CASTLING OR PROMOTION CAUSES INCONSISTENCIES IN BOARD STATE
+
     public void undoMove(Move move) {
         if (isCheckmate) {
             isCheckmate = false;
@@ -232,6 +239,11 @@ public class Board {
         }
 
         castlingRights = move.getPreviousCastlingRights();
+
+        if (!isEndgamePhase()) {
+            this.isEndgamePhase = false;
+        }
+
         setIsWhitesTurn(!getIsWhitesTurn());
 
         positionHash = zobristHasher.updatePositionHash(positionHash, move);

@@ -23,7 +23,7 @@
   <title>Play Against Engine</title>
 </head>
 <body>
-  <p class="notification">The server is very slow at the moment, so the engine move might take some time</p>
+  <p class="notification">The first engine move might take 1-2 minutes because the server might need to boot up</p>
   <div id="board-container">
     
     <div id="board"></div>
@@ -35,7 +35,7 @@
           <div id="loading-msg">Calculating move</div>
           <div class="dot-pulse"></div>
         </div>
-        
+        <div id="error-msg" class="hidden">An Error occurred. Try refreshing the site.</div>
       </div>
       
       <div id="misc-container">
