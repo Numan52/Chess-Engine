@@ -21,6 +21,14 @@ function onDragStart (source, piece, position, orientation) {
 
 }
 
+
+function addResizehandler() {
+  window.addEventListener("resize", (event) => {
+    board.resize()
+  })
+}
+
+
 async function onDrop (source, target) {
   // see if the move is legal
   
@@ -34,7 +42,9 @@ async function onDrop (source, target) {
     console.log("illegal move")
     return 'snapback'
   }
+  
   updateStatus()
+  updateFenInfo(game.fen())
   // board.position(game.fen())
 
 
@@ -52,17 +62,20 @@ async function onDrop (source, target) {
       to: moveData.to,
       promotion: 'q'
     })
+    console.log("computer")
+    removeLoadingMsg()
+    updateStatus()
+    board.position(game.fen())
+    updateFenInfo(game.fen())
+
   } catch (error) {
     console.log("An Error occurred.")
     removeLoadingMsg()
     displayErrorMsg()
     return
   }
- 
-
-  removeLoadingMsg()
-  updateStatus()
-  board.position(game.fen())
+  
+  
 }
 
 
@@ -122,6 +135,8 @@ function updateStatus () {
     }
   }
 
+
+
   $status.html(status)
   $fen.html(game.fen())
   $pgn.html(game.pgn())
@@ -138,9 +153,23 @@ var config = {
 }
 
 
+function intialize() {
+  addResizehandler()
+
+  updateFenInfo(game.fen())
+}
+
+
+function updateFenInfo(fen) {
+  const info = document.querySelector(".info-bottom-tooltip-text")
+  info.textContent = `Fen: ${game.fen()}`
+}
+
+
 console.log("hello")
 board = Chessboard('board', config)
 
+intialize()
 console.log(JSON.stringify({ fen: "dasdadad asdad asdada"}))
 
 updateStatus()

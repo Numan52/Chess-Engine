@@ -23,24 +23,54 @@
   <title>Play Against Engine</title>
 </head>
 <body>
-  <p class="notification">The first engine move might take 1-2 minutes because the server might need to boot up</p>
+  
+  <header>
+    <div class="header">
+      <h1 class="header-title">Play Stockbird</h1>
+      <div class="header-right">
+        <button class="login-btn">Login</button>
+      </div>
+      
+    </div>
+
+    <p class="notification">The first engine move might take 1-2 minutes because the server might need to boot up</p>
+  </header>
+
+
+
   <div id="board-container">
     
     <div id="board"></div>
     <div id="info-container">
       <div id="status-container">
-        <label>Status:</label>
-        <div id="status"></div>
+        <div class="opp-remaining-time">
+          4:12
+        </div>
+
+        <div class="status">
+            white to move
+        </div>
+
+        <div class="own-remaining-time">
+          5:10
+        </div>
+
         <div id="loading-container" class="hidden">
           <div id="loading-msg">Calculating move</div>
           <div class="dot-pulse"></div>
         </div>
+
         <div id="error-msg" class="hidden">An Error occurred. Try refreshing the site.</div>
+
       </div>
       
-      <div id="misc-container">
-        <label>FEN:</label>
-        <div id="fen"></div>
+      <div id="info-bottom-container">
+
+        <div class="info-bottom-tooltip-container">
+          <img class="info-bottom-tooltip" src="images/info-icon.png" alt="">
+          <span class="info-bottom-tooltip-text"></span>
+        </div>
+      
       </div>
       
     </div>
