@@ -117,6 +117,7 @@ body {
     flex-direction: row;
     align-items: center;
     gap: 40px;
+    margin-top: 10px;
 }
 
 
@@ -126,6 +127,7 @@ body {
 
 
 #error-msg {
+    margin-top: 10px;
     color: red;
 }
 
@@ -135,6 +137,26 @@ body {
     flex-direction: column;
     margin-top: 10px;
     
+}
+
+
+.game-start-container {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    align-items: center;
+}
+
+
+.side-choices-container {
+    margin-top: 10px;
+    display: flex;
+    gap: 10px;
+}
+
+
+.play-as-text {
+    text-align: center;
 }
 
 
@@ -159,6 +181,8 @@ body {
 }
 
 
+
+
 .own-remaining-time {
     padding: 10px;
     width: fit-content;
@@ -170,6 +194,82 @@ body {
 }
 
 
+.play-as-side-container img{
+    box-shadow: 0px 0px 2px 2px rgba(128, 128, 128, 0.308);
+    border-radius: 10px;
+    cursor: pointer;
+    width: 80px;
+}
+
+
+.timer-container {
+    display: flex;
+    gap: 10px;
+}
+
+
+.start-game-button {
+    margin-top: 20px;
+    padding: 5px 15px;
+    border-radius: 5px;
+    border: none;
+    box-shadow: 0px 0px 4px 2px rgba(128, 128, 128, 0.438);
+    background-color: rgb(0, 192, 0);
+    width: 100%;
+    height: 50px;
+    font-size: 1.5rem;
+    cursor: pointer;
+}
+
+
+.timer-container button{
+    margin-top: 20px;
+    border: none;
+
+    box-shadow: 0px 0px 2px 2px rgba(128, 128, 128, 0.308);
+    border-radius: 10px;
+    padding: 5px;
+    cursor: pointer;
+    font-size: 1.1rem;
+}
+
+
+.play-again-button {
+    margin-top: 20px;
+    padding: 5px 15px;
+    height: 40px;
+    border-radius: 5px;
+    border: none;
+    box-shadow: 0px 0px 3px 1px rgba(128, 128, 128, 0.582);
+    font-size: 1.1rem;
+    background-color: rgb(0, 192, 0);
+    cursor: pointer;
+}
+
+
+.surrender-btn {
+    margin-top: 20px;
+    height: 30px;
+    padding: 5px 10px;
+    border-radius: 5px;
+    border: none;
+    box-shadow: 0px 0px 3px 2px rgba(128, 128, 128, 0.651);
+    font-size: 1.1rem;
+    cursor: pointer;
+}
+
+
+.selected {
+    border: 3px solid rgb(0, 192, 0) !important;
+    border-radius: 10px;
+    box-sizing: border-box;
+}
+
+
+
+
+
+
 @media (max-width: 768px) {
     #board-container {
         flex-direction: column; 
@@ -178,11 +278,11 @@ body {
     }
 
     #board {
-        width: 60%;
+        width: 70%;
     }
 
 
     #info-container {
-        width: 90%;
+        width: 70%;
     }
 }

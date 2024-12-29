@@ -42,23 +42,47 @@
     
     <div id="board"></div>
     <div id="info-container">
+      
+      <div class="game-start-container">
+        <div class="choose-side-container">
+
+        </div>
+
+        <div class="choose-minutes-container">
+
+        </div>
+      </div>
+
       <div id="status-container">
-        <div class="opp-remaining-time">
-          4:12
-        </div>
+        
+        <div class="time-control-container hidden">
+          <div class="opp-remaining-time">
+            
+          </div>
+  
+          <div class="status">
+            <div class="status-message">
 
-        <div class="status">
-            white to move
+            </div>
+            <div id="loading-container" class="hidden">
+              <div id="loading-msg">Calculating move</div>
+              <div class="dot-pulse"></div>
+            </div>
+          </div>
+  
+          <div class="own-remaining-time">
+            
+          </div>
+          
+          <button class="play-again-button hidden">
+            Play Again
+          </button>
         </div>
-
-        <div class="own-remaining-time">
-          5:10
+        
+        <div class="surrender-btn-container">
+          <button class="surrender-btn hidden"></button>
         </div>
-
-        <div id="loading-container" class="hidden">
-          <div id="loading-msg">Calculating move</div>
-          <div class="dot-pulse"></div>
-        </div>
+        
 
         <div id="error-msg" class="hidden">An Error occurred. Try refreshing the site.</div>
 
@@ -67,7 +91,7 @@
       <div id="info-bottom-container">
 
         <div class="info-bottom-tooltip-container">
-          <img class="info-bottom-tooltip" src="images/info-icon.png" alt="">
+          <img class="info-bottom-tooltip" src="img/info-icon.png" alt="">
           <span class="info-bottom-tooltip-text"></span>
         </div>
       
