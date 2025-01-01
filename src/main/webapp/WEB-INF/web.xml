@@ -7,7 +7,7 @@
 
     <servlet>
         <servlet-name>EngineServlet</servlet-name>
-        <servlet-class>org.example.Servlets.EngineServlet</servlet-class>
+        <servlet-class>org.example.server.Servlets.EngineServlet</servlet-class>
     </servlet>
 
     <servlet-mapping>
@@ -15,6 +15,20 @@
         <url-pattern>/engine</url-pattern>
     </servlet-mapping>
 
+<!--    <servlet>-->
+<!--        <servlet-name>AuthServlet</servlet-name>-->
+<!--        <servlet-class>org.example.server.Servlets.AuthServlet</servlet-class>-->
+<!--    </servlet>-->
+
+<!--    <servlet-mapping>-->
+<!--        <servlet-name>AuthServlet</servlet-name>-->
+<!--        <url-pattern>/login</url-pattern>-->
+<!--    </servlet-mapping>-->
+
+<!--    <servlet-mapping>-->
+<!--        <servlet-name>AuthServlet</servlet-name>-->
+<!--        <url-pattern>/register</url-pattern>-->
+<!--    </servlet-mapping>-->
 
     <filter>
         <filter-name>CorsFilter</filter-name>
