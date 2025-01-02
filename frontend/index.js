@@ -6,6 +6,7 @@ import {
   intializeTimeControl,
 } from "./UICreator.js";
 import { formatTime } from "./utils.js";
+import { getUsernameFromToken, isLoggedIn } from "./authentication.js";
 
 let board = null;
 let game = new Chess();
@@ -21,6 +22,27 @@ let gameState = {
 
 };
 
+
+function updateLoginStatus() {
+
+  const loginBtn = document.querySelector(".login-btn")
+  const usernameSpan = document.querySelector(".username")
+  const token = localStorage.getItem("token")
+
+  if(isLoggedIn()) {
+    const username = getUsernameFromToken(token)
+    loginBtn.style.display = "none"
+    usernameSpan.style.display = "inline"
+    usernameSpan.textContent = username
+  } else {
+    loginBtn.style.display = "inline"
+    usernameSpan.style.display = "none"
+  }
+  
+  }
+
+
+ 
 let startingPosition =
   "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1";
 let $status = $("#status-message");
@@ -61,9 +83,17 @@ function setPlayer(side) {
 }
 
 function addResizehandler() {
-  window.addEventListener("resize", (event) => {
+  window.addEventListener("resize", () => {
     board.resize();
   });
+}
+
+
+function loginClickHandler() {
+  const loginBtn = document.querySelector(".login-btn")
+  loginBtn.addEventListener("click", () => {
+    document.location.href = "/login.html"
+  })
 }
 
 async function onDrop(source, target) {
@@ -223,27 +253,38 @@ function setTime(minutes) {
   gameState.bRemainingSeconds = minutes * 60;
 }
 
-function updateTime(wTimeSelector, bTimeSelector) {
-  const whiteTime = document.querySelector(wTimeSelector);
-  const blackTime = document.querySelector(bTimeSelector);
+function updateTime(ownTimeSelector, oppTimeSelector) {
+  const ownTime = document.querySelector(ownTimeSelector);
+
+  const oppTime = document.querySelector(oppTimeSelector);
   const statusDiv = document.querySelector(".status-message");
 
   const timerInterval = setInterval(() => {
     if (game.turn() === "w") {
       gameState.wRemainingSeconds--;
-      whiteTime.textContent = formatTime(gameState.wRemainingSeconds);
+      if (gameState.player === "w") {
+        ownTime.textContent = formatTime(gameState.wRemainingSeconds);
+      } else {
+        oppTime.textContent = formatTime(gameState.wRemainingSeconds);
+      }
+      
       if (gameState.wRemainingSeconds === 0 || !gameState.gameStarted) {
         handleGameOver(true, statusDiv);
         clearInterval(timerInterval);
       }
     } else {
       gameState.bRemainingSeconds--;
-      blackTime.textContent = formatTime(gameState.bRemainingSeconds);
+      if (gameState.player === "b") {
+        ownTime.textContent = formatTime(gameState.bRemainingSeconds);
+      } else {
+        oppTime.textContent = formatTime(gameState.bRemainingSeconds);
+      }
       if (gameState.bRemainingSeconds === 0 || !gameState.gameStarted) {
         handleGameOver(false, statusDiv);
         clearInterval(timerInterval);
       }
     }
+
   }, 1000);
 }
 
@@ -344,5 +385,6 @@ board = Chessboard("board", config);
 
 displayStartUI();
 console.log(JSON.stringify({ fen: "dasdadad asdad asdada" }));
-
+loginClickHandler()
+updateLoginStatus()
 updateStatus();
