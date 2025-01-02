@@ -1,9 +1,9 @@
-package org.example.Evaluation;
+package org.example.chess.Evaluation;
 
-import org.example.Board;
-import org.example.Piece.Pawn;
-import org.example.Piece.Piece;
-import org.example.Piece.PieceType;
+import org.example.chess.Board;
+import org.example.chess.Piece.Pawn;
+import org.example.chess.Piece.Piece;
+import org.example.chess.Piece.PieceType;
 
 import java.util.ArrayList;
 import java.util.List;

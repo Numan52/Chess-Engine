@@ -1,4 +1,4 @@
-package org.example.Servlets;
+package org.example.server.Servlets;
 
 
 
@@ -6,9 +6,9 @@ import com.google.gson.Gson;
 import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
-import org.example.*;
-import org.example.Evaluation.*;
-import org.example.Utils.ChessUtils;
+import org.example.chess.*;
+import org.example.chess.Evaluation.*;
+import org.example.chess.Utils.ChessUtils;
 import org.json.JSONException;
 import org.json.JSONObject;
 
@@ -30,12 +30,11 @@ public class EngineServlet extends HttpServlet {
         PawnEvaluater pawnEvaluater = new PawnEvaluater(board);
         PositionEvaluater positionEvaluater = new PositionEvaluater(board, List.of(pawnEvaluater, kingSafetyEvaluater, activityEvaluator));
         TranspositionTable transpositionTable = new TranspositionTable();
-        Searcher searcher = new Searcher(board, 12, 12000, positionEvaluater, transpositionTable);
+        Searcher searcher = new Searcher(board, 8, 12000, positionEvaluater, transpositionTable);
         ChessEngine chessEngine = new ChessEngine(board, searcher, positionEvaluater, zobristHash);
 
 
 
-        Gson gson = new Gson();
         StringBuilder jsonBody = new StringBuilder();
 
         try (BufferedReader reader = request.getReader()) {

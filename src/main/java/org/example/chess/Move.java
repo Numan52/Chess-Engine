@@ -1,7 +1,7 @@
-package org.example;
+package org.example.chess;
 
-import org.example.Piece.Piece;
-import org.example.Piece.PieceType;
+import org.example.chess.Piece.Piece;
+import org.example.chess.Piece.PieceType;
 
 import java.util.Objects;
 

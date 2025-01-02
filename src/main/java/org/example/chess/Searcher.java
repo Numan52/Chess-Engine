@@ -1,7 +1,7 @@
-package org.example;
+package org.example.chess;
 
-import org.example.Evaluation.PositionEvaluater;
-import org.example.Evaluation.TranspositionTable;
+import org.example.chess.Evaluation.PositionEvaluater;
+import org.example.chess.Evaluation.TranspositionTable;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -64,6 +64,7 @@ public class Searcher {
             }
         }
 
+        boolean isPvNode = true;
         Move bestMove = null;
         List<Move> bestPath = new ArrayList<>();
         int evalType = 0;
@@ -76,14 +77,25 @@ public class Searcher {
                 if (isTimeUp) {
                     break;
                 }
-                //TODO: WHY CHECK THE OTHER MOVES IF CHECKMATE WAS FOUND
+                MoveScore childScore;
+
                 board.makeMove(move);
-                MoveScore childScore = minimax(board, depth - 1, alpha, beta, false, startTime);
+                // Principal Variation Search
+//                if (isPvNode) {
+//                    childScore = minimax(board, depth - 1, alpha, beta, false, startTime);
+//                } else {
+//                    childScore = minimax(board, depth - 1, beta - 1, beta, false, startTime);
+//                    if (childScore.score > alpha && childScore.score < beta) {
+//                        childScore = minimax(board, depth - 1, alpha, beta, false, startTime);
+//                    }
+//                }
+                childScore = minimax(board, depth - 1, alpha, beta, false, startTime);
                 boolean isCheckmate = board.getIsCheckmate();
                 board.undoMove(move);
 
 
                 if (childScore.score > maxEval) {
+
                     bestMove = move;
                     maxEval = childScore.score;
                     bestPath = new ArrayList<>(childScore.movePath);
@@ -103,6 +115,8 @@ public class Searcher {
                 if (isCheckmate) {
                     break;
                 }
+
+                isPvNode = false;
             }
             transpositionTable.store(board.getPositionHash(), depth, maxEval, false, evalType, bestMove);
             return new MoveScore(bestMove, maxEval, bestPath);
@@ -115,8 +129,22 @@ public class Searcher {
                 if (isTimeUp) {
                     break;
                 }
+
+                MoveScore childScore;
+
                 board.makeMove(move);
-                MoveScore childScore = minimax(board, depth - 1, alpha, beta, true, startTime);
+
+                // Principal Variation Search
+//                if (isPvNode) {
+//                    childScore = minimax(board, depth - 1, alpha, beta, true, startTime);
+//                } else {
+//                    childScore = minimax(board, depth - 1, beta - 1, beta, true, startTime);
+//                    if (childScore.score < beta && childScore.score > alpha) {
+//                        childScore = minimax(board, depth - 1, alpha, beta, true, startTime);
+//                    }
+//                }
+
+                childScore = minimax(board, depth - 1, alpha, beta, true, startTime);
                 boolean isCheckmate = board.getIsCheckmate();
                 board.undoMove(move);
 
@@ -139,6 +167,8 @@ public class Searcher {
                 if (isCheckmate) {
                     break;
                 }
+
+                isPvNode = false;
             }
 
             transpositionTable.store(board.getPositionHash(), depth, minEval, false, evalType, bestMove);
@@ -168,7 +198,7 @@ public class Searcher {
 
         long startTime = System.currentTimeMillis();
 
-
+        // Iterative Deepening
         for (int depth = 1; depth <= maxDepth; depth++) {
             System.out.println("depth:" + depth);
             if (isTimeUp || System.currentTimeMillis() - startTime >= maxSearchTime) {

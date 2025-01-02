@@ -1,9 +1,9 @@
-package org.example.Evaluation;
+package org.example.chess.Evaluation;
 
-import org.example.Board;
-import org.example.Piece.King;
-import org.example.Piece.Piece;
-import org.example.Piece.PieceType;
+import org.example.chess.Board;
+import org.example.chess.Piece.King;
+import org.example.chess.Piece.Piece;
+import org.example.chess.Piece.PieceType;
 
 public class KingSafetyEvaluater implements Evaluator {
     private Board board;
@@ -134,7 +134,7 @@ public class KingSafetyEvaluater implements Evaluator {
 
         if (!king.getHasKingsideCastlingRights() && !king.getHasQueensideCastlingRights() ) {
             if (isKingBlockingRookIn(king)) {
-                penalty += 60;
+                penalty += 80;
             }
         }
 

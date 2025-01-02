@@ -1,7 +1,7 @@
-package org.example.Utils;
+package org.example.chess.Utils;
 
-import org.example.Board;
-import org.example.Piece.*;
+import org.example.chess.Board;
+import org.example.chess.Piece.*;
 
 public class TestUtils {
 

@@ -1,10 +1,10 @@
-package org.example;
+package org.example.chess;
 
-import org.example.Evaluation.PositionEvaluater;
-import org.example.Piece.King;
-import org.example.Piece.Piece;
-import org.example.Piece.PieceType;
-import org.example.Utils.BoardParser;
+import org.example.chess.Evaluation.PositionEvaluater;
+import org.example.chess.Piece.King;
+import org.example.chess.Piece.Piece;
+import org.example.chess.Piece.PieceType;
+import org.example.chess.Utils.BoardParser;
 
 public class ChessEngine {
     private Board board;

@@ -1,7 +1,7 @@
-package org.example;
+package org.example.chess;
 
-import org.example.Piece.Piece;
-import org.example.Utils.ChessUtils;
+import org.example.chess.Piece.Piece;
+import org.example.chess.Utils.ChessUtils;
 
 import java.util.Random;
 

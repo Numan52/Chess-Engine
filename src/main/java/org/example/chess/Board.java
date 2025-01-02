@@ -1,8 +1,11 @@
-package org.example;
+package org.example.chess;
 
-import org.example.Piece.*;
-import org.example.Utils.BoardParser;
-import org.example.Utils.ChessUtils;
+import org.example.chess.Piece.King;
+import org.example.chess.Piece.Piece;
+import org.example.chess.Piece.PieceType;
+import org.example.chess.Piece.Queen;
+import org.example.chess.Utils.BoardParser;
+import org.example.chess.Utils.ChessUtils;
 
 import java.util.*;
 

@@ -1,7 +1,7 @@
-package org.example.Piece;
+package org.example.chess.Piece;
 
-import org.example.Board;
-import org.example.Move;
+import org.example.chess.Board;
+import org.example.chess.Move;
 
 import java.util.ArrayList;
 import java.util.List;

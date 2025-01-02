@@ -1,9 +1,9 @@
-package org.example.Evaluation;
+package org.example.chess.Evaluation;
 
-import org.example.Board;
-import org.example.Piece.Piece;
-import org.example.Piece.PieceType;
-import org.example.Utils.ChessUtils;
+import org.example.chess.Board;
+import org.example.chess.Piece.Piece;
+import org.example.chess.Piece.PieceType;
+import org.example.chess.Utils.ChessUtils;
 
 import java.util.List;
 
@@ -104,6 +104,7 @@ public class ActivityEvaluator implements Evaluator {
 
         int centerRow = isWhite ? 3 : 4;
         int thirdRow = isWhite ? 2 : 5;
+        int startingRow = isWhite ? 1 : 6;
         int cFile = 2;
         int dFile = 3;
         int eFile = 4;
@@ -115,6 +116,13 @@ public class ActivityEvaluator implements Evaluator {
         boolean fCenterSupport = isPieceType(thirdRow, fFile, PieceType.PAWN, isWhite);
         boolean dCenterSupport = isPieceType(thirdRow, dFile, PieceType.PAWN, isWhite);
         boolean eCenterSupport = isPieceType(thirdRow, eFile, PieceType.PAWN, isWhite);
+
+        if (isPieceType(startingRow, 3, PieceType.PAWN, isWhite)) {
+            penalty += 20;
+        }
+        if (isPieceType(startingRow, 4, PieceType.PAWN, isWhite)) {
+            penalty += 20;
+        }
 
         if (dCenterOccupied) {
             penalty -= 40;
@@ -137,6 +145,7 @@ public class ActivityEvaluator implements Evaluator {
 
         return penalty;
     }
+
 
 
     public double evaluateMobility(boolean isWhite) {

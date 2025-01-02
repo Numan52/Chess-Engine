@@ -1,6 +1,6 @@
-package org.example.Evaluation;
+package org.example.chess.Evaluation;
 
-import org.example.Move;
+import org.example.chess.Move;
 
 import java.util.HashMap;
 import java.util.Map;

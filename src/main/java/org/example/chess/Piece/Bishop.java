@@ -1,17 +1,16 @@
-package org.example.Piece;
+package org.example.chess.Piece;
 
 
-import org.example.Board;
-import org.example.Move;
+import org.example.chess.Board;
+import org.example.chess.Move;
 
-import java.util.ArrayList;
 import java.util.List;
 
-public class Knight extends Piece {
-    private static final int VALUE = 300;
+public class Bishop extends Piece {
+    private static final int VALUE = 325;
 
-    public Knight(Board chessboard, int x, int y, boolean isWhite) {
-        super(chessboard, x, y, isWhite, PieceType.KNIGHT);
+    public Bishop(Board chessboard, int x, int y, boolean isWhite) {
+        super(chessboard, x, y, isWhite, PieceType.BISHOP);
     }
 
 
@@ -19,30 +18,31 @@ public class Knight extends Piece {
     public boolean canMoveTo(int targetRow, int targetCol) {
         int movedRows = Math.abs(targetRow - this.getRow());
         int movedCols = Math.abs(targetCol - this.getCol());
-
         if (!isWithinBoard(targetRow, targetCol) || isFriendlyPiece(targetRow, targetCol)) {
             return false;
         }
 
-        if ((movedRows == 2 && movedCols == 1) ||
-            (movedRows == 1 && movedCols == 2))
+
+        if (movedRows - movedCols == 0 &&
+            !isPieceBlockingDiagonal(targetRow, targetCol))
         {
             return true;
         }
+
         return false;
     }
 
     @Override
     public int[][] getPieceSquareTable() {
         return new int[][] {
-                {-50, -40, -30, -30, -30, -30, -40, -50},
-                {-40, -20, 0, 0, 0, 0, -20, -40},
-                {-30, 0, 10, 15, 15, 10, 0, -30},
-                {-30, 5, 15, 20, 20, 15, 5, -30},
-                {-30, 5, 15, 20, 20, 15, 5, -30},
-                {-30, 0, 10, 15, 15, 10, 0, -30},
-                {-40, -20, 0, 5, 5, 0, -20, -40},
-                {-50, -40, -30, -30, -30, -30, -40, -50}
+                {-20, -10, -10, -10, -10, -10, -10, -20},
+                {-10, 0, 0, 0, 0, 0, 0, -10},
+                {-10, 0, 5, 10, 10, 5, 0, -10},
+                {-10, 5, 5, 10, 10, 5, 5, -10},
+                {-10, 5, 5, 10, 10, 5, 5, -10},
+                {-10, 0, 5, 10, 10, 5, 0, -10},
+                {-10, 0, 0, 0, 0, 0, 0, -10},
+                {-20, -10, -10, -10, -10, -10, -10, -20}
         };
     }
 
@@ -53,8 +53,8 @@ public class Knight extends Piece {
 
     @Override
     public List<Move> generatePossibleMoves() {
-        int[][] squares = {{2, 1}, {1, 2}, {-1, 2}, {-2, 1}, {-2, -1}, {-1, -2}, {1, -2}, {2, -1}};
-        return super.generateFixedMoves(squares);
+        int[][] directions = {{1, 1}, {1, -1}, {-1, -1}, {-1, 1}};
+        return super.generateDirectionalMoves(directions);
     }
 
     @Override

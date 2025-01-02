@@ -1,9 +1,11 @@
-package org.example.Utils;
+package org.example.chess.Utils;
 
-import org.example.Board;
-import org.example.Move;
-import org.example.Piece.*;
-import org.example.Searcher;
+import org.example.chess.Board;
+import org.example.chess.Move;
+import org.example.chess.Searcher;
+import org.example.chess.Piece.King;
+import org.example.chess.Piece.Piece;
+import org.example.chess.Piece.PieceType;
 
 import java.util.ArrayList;
 import java.util.List;

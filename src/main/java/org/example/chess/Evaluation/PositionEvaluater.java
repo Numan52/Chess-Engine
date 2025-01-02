@@ -1,7 +1,7 @@
-package org.example.Evaluation;
+package org.example.chess.Evaluation;
 
-import org.example.Board;
-import org.example.Piece.Piece;
+import org.example.chess.Board;
+import org.example.chess.Piece.Piece;
 
 import java.util.List;
 
